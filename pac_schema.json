@@ -1,0 +1,71 @@
+{
+  "_comentario": "Esquema de referencia para el PAC GADMR — Compras Públicas",
+  "_version": "1.0",
+  "_generado": "2026-06-02",
+
+  "estructura_proceso": {
+    "_id":                "número entero, generado automáticamente",
+    "_dir":               "nombre de la dirección que cargó el registro",
+    "num_pac":            "código o número del proceso en el PAC",
+    "descripcion":        "objeto o descripción del proceso de contratación",
+    "tipo":               "tipo de contratación (Subasta Inversa, Menor Cuantía, Licitación, etc.)",
+    "monto":              "monto referencial en USD (número)",
+    "estado":             "Sin iniciar | En proceso | Publicado SERCOP | En evaluación | Adjudicado | Finalizado | Desierto | Suspendido",
+    "fase":               "fase actual del proceso (Preparación, Precontractual, Contractual, etc.)",
+    "responsable":        "nombre del responsable o director",
+    "fecha_planificada":  "fecha de inicio planificada (YYYY-MM-DD o texto)",
+    "fecha_fin":          "fecha fin planificada",
+    "partida":            "partida presupuestaria",
+    "cpc":                "clasificador CPC del bien/servicio",
+    "tramite_edoc":       "número de trámite vinculado en el e-DOC (ej: 1176741 o GADMR-DG-OP-2026-2372)",
+    "estado_edoc":        "estado del trámite en e-DOC (si se conoce)",
+    "fase_edoc":          "fase del trámite en e-DOC"
+  },
+
+  "tipos_contratacion_ecuador": [
+    "Subasta Inversa Electrónica",
+    "Menor Cuantía Bienes/Servicios",
+    "Menor Cuantía Obras",
+    "Cotización",
+    "Licitación",
+    "Licitación de Seguros",
+    "Consultoría — Lista Corta",
+    "Consultoría — Concurso Público",
+    "Contratación Directa",
+    "Ínfima Cuantía",
+    "Régimen Especial",
+    "Convenio Marco",
+    "Compra por Catálogo"
+  ],
+
+  "fases_proceso": [
+    "Preparación",
+    "Precontractual",
+    "Oferta",
+    "Evaluación",
+    "Adjudicación",
+    "Contractual",
+    "Recepción",
+    "Liquidación"
+  ],
+
+  "columnas_tipicas_excel_pac_sercop": [
+    "Código CPC",
+    "Descripción del Objeto de Contratación",
+    "Tipo de Contratación",
+    "Presupuesto Referencial",
+    "Mes de Inicio",
+    "Cuatrimestre",
+    "Partida Presupuestaria",
+    "Estado"
+  ],
+
+  "instrucciones_carga": {
+    "paso_1": "En el dashboard, ir a 'Cargar PAC'",
+    "paso_2": "Seleccionar la dirección en el desplegable",
+    "paso_3": "Arrastrar o seleccionar el Excel del PAC (.xlsx, .xls o .csv)",
+    "paso_4": "El sistema detecta columnas automáticamente — verificar el mapeo",
+    "paso_5": "Hacer clic en 'Importar datos'",
+    "paso_6": "Vincular cada proceso con su trámite e-DOC usando el botón '+' en la tabla"
+  }
+}

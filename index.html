@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAC Monitor — GADMR Compras Públicas</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --bg2: #181c27;
+  --bg3: #1e2333;
+  --bg4: #252b3e;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8eaf0;
+  --text2: #8b90a4;
+  --text3: #545a70;
+  --accent: #4f7cff;
+  --accent2: #2d52cc;
+  --green: #22c55e;
+  --yellow: #f59e0b;
+  --red: #ef4444;
+  --orange: #f97316;
+  --purple: #a855f7;
+  --teal: #14b8a6;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+  --sidebar-w: 240px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: var(--sans); background: var(--bg); color: var(--text); font-size: 14px; overflow: hidden; }
+
+/* Layout */
+#app { display: flex; height: 100vh; }
+#sidebar { width: var(--sidebar-w); background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+#topbar { height: 52px; background: var(--bg2); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; gap: 12px; flex-shrink: 0; }
+#content { flex: 1; overflow-y: auto; padding: 24px; }
+
+/* Sidebar */
+.sidebar-logo { padding: 16px; border-bottom: 1px solid var(--border); }
+.sidebar-logo .title { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; color: var(--accent); text-transform: uppercase; font-family: var(--mono); }
+.sidebar-logo .sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.nav-section { padding: 12px 8px 4px; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: var(--text3); text-transform: uppercase; font-family: var(--mono); }
+.nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: var(--text2); font-size: 13px; transition: all 0.15s; margin: 1px 8px; }
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: rgba(79,124,255,0.12); color: var(--accent); }
+.nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+.sidebar-bottom { margin-top: auto; padding: 12px; border-top: 1px solid var(--border); }
+.api-key-wrap { display: flex; flex-direction: column; gap: 6px; }
+.api-key-label { font-size: 10px; color: var(--text3); font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.api-key-input { background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 6px 10px; font-size: 11px; color: var(--text2); font-family: var(--mono); width: 100%; }
+.api-key-input:focus { outline: none; border-color: var(--accent); color: var(--text); }
+
+/* Topbar */
+.topbar-title { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; }
+.topbar-stats { display: flex; gap: 16px; align-items: center; }
+.topbar-stat { font-family: var(--mono); font-size: 11px; color: var(--text2); }
+.topbar-stat span { color: var(--text); font-weight: 500; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border2); background: var(--bg3); color: var(--text2); cursor: pointer; font-size: 12px; font-family: var(--sans); transition: all 0.15s; }
+.btn:hover { background: var(--bg4); color: var(--text); border-color: var(--border2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { background: var(--accent2); }
+.btn svg { width: 14px; height: 14px; }
+
+/* Metrics */
+.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.metric-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+.metric-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); font-family: var(--mono); margin-bottom: 8px; }
+.metric-value { font-size: 28px; font-weight: 300; font-family: var(--mono); color: var(--text); line-height: 1; }
+.metric-value.green { color: var(--green); }
+.metric-value.yellow { color: var(--yellow); }
+.metric-value.red { color: var(--red); }
+.metric-value.accent { color: var(--accent); }
+.metric-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+/* Upload zone */
+.upload-zone { border: 1px dashed var(--border2); border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--bg2); }
+.upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: rgba(79,124,255,0.05); }
+.upload-zone .upload-icon { width: 40px; height: 40px; margin: 0 auto 12px; color: var(--text3); }
+.upload-zone h3 { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+.upload-zone p { font-size: 12px; color: var(--text2); }
+.upload-zone input { display: none; }
+
+/* Table */
+.table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.table-header { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border); gap: 10px; }
+.table-title { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; }
+.search-input { background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 6px 10px; font-size: 12px; color: var(--text); width: 240px; font-family: var(--sans); }
+.search-input::placeholder { color: var(--text3); }
+.search-input:focus { outline: none; border-color: var(--accent); }
+.filter-select { background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 6px 10px; font-size: 12px; color: var(--text2); font-family: var(--sans); cursor: pointer; }
+.filter-select:focus { outline: none; border-color: var(--accent); }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+thead th { padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text3); font-family: var(--mono); border-bottom: 1px solid var(--border); background: var(--bg3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; user-select: none; }
+thead th:hover { color: var(--text2); }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+tbody td { padding: 10px 12px; font-size: 12px; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+tbody td.primary { color: var(--text); font-weight: 500; }
+tbody td.mono { font-family: var(--mono); font-size: 11px; }
+.badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; font-family: var(--mono); }
+.badge.green { background: rgba(34,197,94,0.1); color: var(--green); }
+.badge.yellow { background: rgba(245,158,11,0.1); color: var(--yellow); }
+.badge.red { background: rgba(239,68,68,0.1); color: var(--red); }
+.badge.blue { background: rgba(79,124,255,0.1); color: var(--accent); }
+.badge.gray { background: rgba(139,144,164,0.1); color: var(--text2); }
+.badge.purple { background: rgba(168,85,247,0.1); color: var(--purple); }
+.badge.teal { background: rgba(20,184,166,0.1); color: var(--teal); }
+.badge.orange { background: rgba(249,115,22,0.1); color: var(--orange); }
+
+/* edoc link cell */
+.edoc-cell { display: flex; align-items: center; gap: 6px; }
+.edoc-link { color: var(--accent); font-family: var(--mono); font-size: 11px; cursor: pointer; text-decoration: none; }
+.edoc-link:hover { text-decoration: underline; }
+.edoc-add-btn { width: 20px; height: 20px; border-radius: 4px; background: var(--bg4); border: 1px solid var(--border2); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text3); font-size: 14px; line-height: 1; transition: all 0.15s; }
+.edoc-add-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(2px); }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 12px; padding: 24px; width: 480px; max-width: 95vw; }
+.modal-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.modal-sub { font-size: 12px; color: var(--text2); margin-bottom: 20px; }
+.form-field { margin-bottom: 14px; }
+.form-label { font-size: 11px; color: var(--text3); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px; display: block; }
+.form-input { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 8px 12px; font-size: 13px; color: var(--text); font-family: var(--mono); }
+.form-input:focus { outline: none; border-color: var(--accent); }
+.form-select { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 8px 12px; font-size: 13px; color: var(--text); font-family: var(--sans); cursor: pointer; }
+.form-select:focus { outline: none; border-color: var(--accent); }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+/* Chat */
+#chat-panel { width: 340px; background: var(--bg2); border-left: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; transition: all 0.2s; }
+#chat-panel.hidden { width: 0; overflow: hidden; border: none; }
+.chat-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+.chat-header-title { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; }
+.chat-model { font-size: 10px; color: var(--text3); font-family: var(--mono); }
+#chat-messages { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.chat-msg { max-width: 100%; }
+.chat-msg.user .bubble { background: rgba(79,124,255,0.12); border: 1px solid rgba(79,124,255,0.2); margin-left: 20%; }
+.chat-msg.ai .bubble { background: var(--bg3); border: 1px solid var(--border); }
+.bubble { padding: 10px 12px; border-radius: 8px; font-size: 12px; line-height: 1.5; color: var(--text); }
+.chat-input-wrap { padding: 12px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+.chat-input { flex: 1; background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; padding: 8px 10px; font-size: 12px; color: var(--text); font-family: var(--sans); resize: none; min-height: 36px; max-height: 80px; }
+.chat-input:focus { outline: none; border-color: var(--accent); }
+.chat-send { padding: 8px 10px; background: var(--accent); border: none; border-radius: 6px; cursor: pointer; color: #fff; display: flex; align-items: center; }
+.chat-send:hover { background: var(--accent2); }
+.chat-send svg { width: 14px; height: 14px; }
+.typing-dot { display: inline-flex; gap: 3px; align-items: center; }
+.typing-dot span { width: 4px; height: 4px; background: var(--text3); border-radius: 50%; animation: blink 1.2s ease-in-out infinite; }
+.typing-dot span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes blink { 0%,80%,100%{ opacity:0.2 } 40%{ opacity:1 } }
+
+/* Views */
+.view { display: none; }
+.view.active { display: block; }
+
+/* Section tabs */
+.tab-bar { display: flex; gap: 4px; margin-bottom: 16px; background: var(--bg2); border-radius: 8px; padding: 4px; border: 1px solid var(--border); width: fit-content; }
+.tab { padding: 6px 14px; border-radius: 5px; cursor: pointer; font-size: 12px; color: var(--text2); transition: all 0.15s; font-weight: 500; }
+.tab:hover { color: var(--text); }
+.tab.active { background: var(--bg4); color: var(--text); }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 60px 20px; }
+.empty-state svg { width: 48px; height: 48px; color: var(--text3); margin: 0 auto 16px; display: block; }
+.empty-state h3 { font-size: 15px; font-weight: 500; color: var(--text2); margin-bottom: 8px; }
+.empty-state p { font-size: 12px; color: var(--text3); max-width: 300px; margin: 0 auto; }
+
+/* Progress bar */
+.progress-bar { height: 3px; background: var(--bg4); border-radius: 2px; overflow: hidden; margin-top: 6px; }
+.progress-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+
+/* Toast */
+#toast { position: fixed; bottom: 24px; right: 24px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; padding: 12px 16px; font-size: 12px; color: var(--text); z-index: 2000; transform: translateY(80px); opacity: 0; transition: all 0.25s; pointer-events: none; }
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.ok { border-color: rgba(34,197,94,0.3); }
+#toast.err { border-color: rgba(239,68,68,0.3); }
+
+/* Responsive cells */
+.col-num { width: 100px; }
+.col-tipo { width: 120px; }
+.col-estado { width: 110px; }
+.col-fase { width: 120px; }
+.col-monto { width: 110px; text-align: right; }
+.col-resp { width: 140px; }
+.col-fecha { width: 100px; }
+.col-edoc { width: 140px; }
+.col-dir { width: 140px; }
+.col-desc { min-width: 160px; }
+
+/* Summary charts */
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.summary-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+.summary-card h4 { font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text3); font-family: var(--mono); margin-bottom: 14px; }
+.bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.bar-label { font-size: 11px; color: var(--text2); width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 0; }
+.bar-track { flex: 1; height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; }
+.bar-count { font-size: 10px; font-family: var(--mono); color: var(--text3); width: 24px; text-align: right; }
+
+/* Inline editable */
+.editable { cursor: pointer; }
+.editable:hover { text-decoration: underline dashed; text-underline-offset: 3px; }
+
+/* Column toggle */
+.col-toggle-wrap { display: flex; align-items: center; gap: 4px; }
+.col-toggle-btn { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-family: var(--mono); cursor: pointer; border: 1px solid var(--border); background: var(--bg3); color: var(--text3); transition: all 0.15s; }
+.col-toggle-btn.active { background: rgba(79,124,255,0.12); color: var(--accent); border-color: rgba(79,124,255,0.3); }
+
+/* Pagination */
+.pagination { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text2); }
+.page-btn { padding: 4px 10px; border-radius: 5px; border: 1px solid var(--border); background: var(--bg3); color: var(--text2); cursor: pointer; font-size: 11px; }
+.page-btn:hover { background: var(--bg4); color: var(--text); }
+.page-btn:disabled { opacity: 0.3; cursor: default; }
+.page-info { flex: 1; text-align: center; font-family: var(--mono); font-size: 11px; }
+
+/* Print */
+@media print {
+  #sidebar, #chat-panel, #topbar { display: none !important; }
+  #content { padding: 0; }
+  body { background: white; color: black; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- Sidebar -->
+<div id="sidebar">
+  <div class="sidebar-logo">
+    <div class="title">PAC Monitor</div>
+    <div class="sub">GADMR · Compras Públicas</div>
+  </div>
+  <div class="nav-section">Vistas</div>
+  <div class="nav-item active" onclick="showView('resumen')" id="nav-resumen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Resumen General
+  </div>
+  <div class="nav-item" onclick="showView('pac')" id="nav-pac">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg>
+    Procesos PAC
+  </div>
+  <div class="nav-item" onclick="showView('alertas')" id="nav-alertas">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Alertas
+    <span id="alert-badge" style="margin-left:auto; background:var(--red); color:#fff; font-size:10px; font-family:var(--mono); padding:1px 6px; border-radius:10px; display:none;">0</span>
+  </div>
+  <div class="nav-item" onclick="showView('cargar')" id="nav-cargar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    Cargar PAC
+  </div>
+  <div class="nav-item" onclick="showView('reporte')" id="nav-reporte">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Reporte
+  </div>
+  <div class="nav-section">Sistema</div>
+  <div class="nav-item" onclick="clearAllData()" id="nav-clear">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    Limpiar datos
+  </div>
+  <div class="sidebar-bottom">
+    <div class="api-key-wrap">
+      <div class="api-key-label">Claude API Key</div>
+      <input class="api-key-input" type="password" id="api-key-input" placeholder="sk-ant-..." oninput="saveApiKey(this.value)">
+    </div>
+  </div>
+</div>
+
+<!-- Main -->
+<div id="main">
+  <!-- Topbar -->
+  <div id="topbar">
+    <div class="topbar-title" id="topbar-title">Resumen General</div>
+    <div class="topbar-stats">
+      <div class="topbar-stat">Total: <span id="top-total">0</span></div>
+      <div class="topbar-stat">Presupuesto: <span id="top-presupuesto">$0</span></div>
+      <div class="topbar-stat" id="top-dirs-wrap">Direcciones: <span id="top-dirs">0</span></div>
+    </div>
+    <button class="btn" onclick="toggleChat()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Claude
+    </button>
+    <button class="btn primary" onclick="exportExcel()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Exportar
+    </button>
+  </div>
+
+  <div id="content">
+
+    <!-- VISTA: RESUMEN -->
+    <div class="view active" id="view-resumen">
+      <div class="metrics-grid" id="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label">Total procesos</div>
+          <div class="metric-value accent" id="m-total">0</div>
+          <div class="metric-sub">en el PAC consolidado</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Presupuesto total</div>
+          <div class="metric-value" id="m-presupuesto">$0</div>
+          <div class="metric-sub">suma de montos referenc.</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Sin iniciar</div>
+          <div class="metric-value yellow" id="m-sin-iniciar">0</div>
+          <div class="metric-sub">pendientes de apertura</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">En proceso</div>
+          <div class="metric-value green" id="m-en-proceso">0</div>
+          <div class="metric-sub">activos en SERCOP/e-DOC</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Finalizados</div>
+          <div class="metric-value" id="m-finalizados">0</div>
+          <div class="metric-sub">adjudicados / completados</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Con vínculo e-DOC</div>
+          <div class="metric-value teal" style="color:var(--teal)" id="m-con-edoc">0</div>
+          <div class="metric-sub">trámites enlazados</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Sin vínculo e-DOC</div>
+          <div class="metric-value red" id="m-sin-edoc">0</div>
+          <div class="metric-sub">requieren enlace</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Direcciones</div>
+          <div class="metric-value" id="m-dirs">0</div>
+          <div class="metric-sub">con PAC cargado</div>
+        </div>
+      </div>
+      <div class="summary-grid" id="summary-charts">
+        <div class="summary-card">
+          <h4>Procesos por dirección</h4>
+          <div id="chart-direcciones"></div>
+        </div>
+        <div class="summary-card">
+          <h4>Distribución por tipo</h4>
+          <div id="chart-tipos"></div>
+        </div>
+        <div class="summary-card">
+          <h4>Estado de procesos</h4>
+          <div id="chart-estados"></div>
+        </div>
+        <div class="summary-card">
+          <h4>Presupuesto por dirección</h4>
+          <div id="chart-presupuesto"></div>
+        </div>
+      </div>
+      <div id="resumen-empty" class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        <h3>Sin datos cargados</h3>
+        <p>Ve a "Cargar PAC" para importar el Excel de cada dirección y comenzar el monitoreo.</p>
+      </div>
+    </div>
+
+    <!-- VISTA: PAC -->
+    <div class="view" id="view-pac">
+      <div class="table-header">
+        <div class="table-title">Procesos PAC consolidados</div>
+        <input class="search-input" type="text" id="pac-search" placeholder="Buscar proceso, descripción, responsable..." oninput="filterTable()">
+        <select class="filter-select" id="pac-filter-dir" onchange="filterTable()">
+          <option value="">Todas las direcciones</option>
+        </select>
+        <select class="filter-select" id="pac-filter-tipo" onchange="filterTable()">
+          <option value="">Todos los tipos</option>
+        </select>
+        <select class="filter-select" id="pac-filter-estado" onchange="filterTable()">
+          <option value="">Todos los estados</option>
+        </select>
+        <select class="filter-select" id="pac-filter-edoc" onchange="filterTable()">
+          <option value="">e-DOC: todos</option>
+          <option value="con">Con vínculo</option>
+          <option value="sin">Sin vínculo</option>
+        </select>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="pac-table">
+          <thead>
+            <tr>
+              <th class="col-num" onclick="sortBy('num_pac')">#PAC ↕</th>
+              <th class="col-dir" onclick="sortBy('direccion')">Dirección ↕</th>
+              <th class="col-desc" onclick="sortBy('descripcion')">Descripción ↕</th>
+              <th class="col-tipo" onclick="sortBy('tipo')">Tipo ↕</th>
+              <th class="col-monto" onclick="sortBy('monto')">Monto ref. ↕</th>
+              <th class="col-estado" onclick="sortBy('estado')">Estado ↕</th>
+              <th class="col-fase" onclick="sortBy('fase')">Fase ↕</th>
+              <th class="col-resp" onclick="sortBy('responsable')">Responsable ↕</th>
+              <th class="col-fecha" onclick="sortBy('fecha_planificada')">Fecha plan. ↕</th>
+              <th class="col-edoc" onclick="sortBy('tramite_edoc')">Vínculo e-DOC ↕</th>
+            </tr>
+          </thead>
+          <tbody id="pac-tbody"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="page-btn" id="prev-btn" onclick="changePage(-1)">← Anterior</button>
+        <div class="page-info" id="page-info">0 registros</div>
+        <button class="page-btn" id="next-btn" onclick="changePage(1)">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- VISTA: ALERTAS -->
+    <div class="view" id="view-alertas">
+      <div id="alertas-container"></div>
+      <div id="alertas-empty" class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+        <h3>Sin alertas activas</h3>
+        <p>No hay procesos sin vínculo e-DOC ni procesos con estado pendiente de revisión.</p>
+      </div>
+    </div>
+
+    <!-- VISTA: CARGAR PAC -->
+    <div class="view" id="view-cargar">
+      <div style="max-width:680px;">
+        <div style="margin-bottom:24px;">
+          <h2 style="font-size:16px; font-weight:500; margin-bottom:6px; color:var(--text);">Cargar PAC por dirección</h2>
+          <p style="font-size:12px; color:var(--text2);">Importa el Excel del PAC de cualquier dirección del GADMR. El sistema detecta columnas automáticamente y mapea los campos conocidos. Los datos se guardan en localStorage.</p>
+        </div>
+
+        <div style="margin-bottom:20px;">
+          <label class="form-label" style="display:block; margin-bottom:8px;">Dirección que carga</label>
+          <select class="form-select" id="upload-dir" style="width:100%; max-width:360px; margin-bottom:12px;">
+            <option value="">— Seleccionar dirección —</option>
+            <option>Dirección de Obras Públicas</option>
+            <option>Dirección de Planificación</option>
+            <option>Dirección Financiera</option>
+            <option>Dirección Administrativa</option>
+            <option>Dirección Jurídica</option>
+            <option>Secretaría General</option>
+            <option>Unidad de Compras Públicas</option>
+            <option>Unidad de TIC</option>
+            <option>Gestión Ambiental</option>
+            <option>Salud</option>
+            <option>Cultura</option>
+            <option value="__otro__">Otra (especificar)</option>
+          </select>
+          <input type="text" class="form-input" id="upload-dir-custom" placeholder="Nombre de la dirección" style="display:none; width:100%; max-width:360px; margin-top:8px;">
+        </div>
+
+        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+          <input type="file" id="file-input" accept=".xlsx,.xls,.csv" onchange="handleFile(event)">
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <h3>Arrastra el Excel del PAC aquí</h3>
+          <p>o haz clic para seleccionar — .xlsx, .xls, .csv</p>
+        </div>
+
+        <div id="column-mapper" style="display:none; margin-top:20px;">
+          <div style="background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:20px;">
+            <h3 style="font-size:13px; font-weight:500; margin-bottom:4px; color:var(--text);">Mapear columnas del Excel</h3>
+            <p style="font-size:11px; color:var(--text2); margin-bottom:16px;">El sistema detectó las siguientes columnas. Asígnalas a los campos del PAC Monitor:</p>
+            <div id="mapper-fields"></div>
+            <div style="display:flex; gap:8px; margin-top:16px;">
+              <button class="btn primary" onclick="importMappedData()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="20 6 9 17 4 12"/></svg>
+                Importar datos
+              </button>
+              <button class="btn" onclick="document.getElementById('column-mapper').style.display='none'">Cancelar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Archivos cargados -->
+        <div style="margin-top:28px;">
+          <h3 style="font-size:12px; font-weight:600; letter-spacing:0.09em; text-transform:uppercase; color:var(--text3); font-family:var(--mono); margin-bottom:12px;">Archivos cargados</h3>
+          <div id="loaded-files-list"></div>
+          <div id="loaded-files-empty" style="font-size:12px; color:var(--text3); padding:12px 0;">Ningún archivo importado aún.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA: REPORTE -->
+    <div class="view" id="view-reporte">
+      <div id="reporte-content">
+        <div style="display:flex; gap:12px; margin-bottom:20px; align-items:center;">
+          <h2 style="font-size:15px; font-weight:500; flex:1;">Reporte de Compras Públicas</h2>
+          <button class="btn" onclick="window.print()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Imprimir
+          </button>
+        </div>
+        <div id="reporte-body"></div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</div><!-- end main -->
+
+<!-- Chat Claude -->
+<div id="chat-panel">
+  <div class="chat-header">
+    <div class="chat-header-title">Asistente Claude</div>
+    <div class="chat-model">claude-haiku-4-5-20251001</div>
+  </div>
+  <div id="chat-messages">
+    <div class="chat-msg ai"><div class="bubble">Hola. Soy el asistente del PAC Monitor. Puedo analizar tus datos de compras públicas, identificar procesos sin vínculo e-DOC, comparar avance por dirección, o responder cualquier consulta sobre los procesos cargados. ¿En qué te ayudo?</div></div>
+  </div>
+  <div class="chat-input-wrap">
+    <textarea class="chat-input" id="chat-input" placeholder="Pregunta sobre el PAC..." rows="1" onkeydown="chatKeydown(event)"></textarea>
+    <button class="chat-send" onclick="sendChat()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+</div><!-- end app -->
+
+<!-- Modal e-DOC -->
+<div class="modal-overlay" id="modal-edoc">
+  <div class="modal">
+    <div class="modal-title">Vincular trámite e-DOC</div>
+    <div class="modal-sub" id="modal-edoc-sub">Ingresa el número de trámite del e-DOC para este proceso PAC.</div>
+    <div class="form-field">
+      <label class="form-label">N° Trámite e-DOC</label>
+      <input class="form-input" type="text" id="edoc-input" placeholder="Ej: 1176741 o GADMR-DG-OP-2026-2372">
+    </div>
+    <div class="form-field">
+      <label class="form-label">Estado actual del proceso</label>
+      <select class="form-select" id="edoc-estado-select">
+        <option value="Sin iniciar">Sin iniciar</option>
+        <option value="En proceso">En proceso</option>
+        <option value="Publicado SERCOP">Publicado SERCOP</option>
+        <option value="En evaluación">En evaluación</option>
+        <option value="Adjudicado">Adjudicado</option>
+        <option value="Finalizado">Finalizado</option>
+        <option value="Desierto">Desierto</option>
+        <option value="Suspendido">Suspendido</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Fase actual</label>
+      <input class="form-input" type="text" id="edoc-fase-input" placeholder="Ej: Preparación, Precontractual, Contractual...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeEdocModal()">Cancelar</button>
+      <button class="btn primary" onclick="saveEdocLink()">Guardar vínculo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+let allData = [];
+let filteredData = [];
+let sortField = '';
+let sortDir = 1;
+let currentPage = 1;
+const PAGE_SIZE = 50;
+let editingId = null;
+let rawRows = [];
+let rawHeaders = [];
+let pendingDir = '';
+let chatVisible = true;
+const EDOC_BASE = 'http://egobedoc.gadmriobamba.gob.ec:8081/issues/';
+
+const FIELD_DEFS = [
+  { key: 'num_pac',           label: 'Número PAC / Código',      type: 'text' },
+  { key: 'descripcion',       label: 'Descripción / Objeto',      type: 'text' },
+  { key: 'tipo',              label: 'Tipo de contratación',       type: 'text' },
+  { key: 'monto',             label: 'Monto referencial',          type: 'number' },
+  { key: 'estado',            label: 'Estado',                     type: 'text' },
+  { key: 'fase',              label: 'Fase actual',                type: 'text' },
+  { key: 'responsable',       label: 'Responsable / Director',     type: 'text' },
+  { key: 'fecha_planificada', label: 'Fecha planificada inicio',   type: 'text' },
+  { key: 'fecha_fin',         label: 'Fecha fin planificada',      type: 'text' },
+  { key: 'partida',           label: 'Partida presupuestaria',     type: 'text' },
+  { key: 'cpc',               label: 'CPC / Clasificador',         type: 'text' },
+];
+
+const ESTADO_COLORS = {
+  'Sin iniciar': 'yellow', 'En proceso': 'green', 'Publicado SERCOP': 'blue',
+  'En evaluación': 'teal', 'Adjudicado': 'green', 'Finalizado': 'gray',
+  'Desierto': 'red', 'Suspendido': 'orange', 'default': 'gray'
+};
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const k = localStorage.getItem('pac_apikey');
+  if (k) document.getElementById('api-key-input').value = k;
+  loadFromStorage();
+  setupDrag();
+  document.getElementById('upload-dir').addEventListener('change', function() {
+    document.getElementById('upload-dir-custom').style.display = this.value === '__otro__' ? 'block' : 'none';
+  });
+});
+
+function saveApiKey(v) { localStorage.setItem('pac_apikey', v); }
+
+// ─── Storage ──────────────────────────────────────────────────────────────────
+function saveToStorage() {
+  localStorage.setItem('pac_data', JSON.stringify(allData));
+}
+function loadFromStorage() {
+  const raw = localStorage.getItem('pac_data');
+  if (raw) {
+    allData = JSON.parse(raw);
+    refreshAll();
+  } else {
+    document.getElementById('resumen-empty').style.display = 'block';
+    document.getElementById('summary-charts').style.display = 'none';
+  }
+}
+function clearAllData() {
+  if (!confirm('¿Eliminar todos los datos cargados? Esta acción no se puede deshacer.')) return;
+  allData = [];
+  localStorage.removeItem('pac_data');
+  refreshAll();
+  showToast('Datos eliminados', 'ok');
+}
+
+// ─── Views ────────────────────────────────────────────────────────────────────
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  const titles = { resumen: 'Resumen General', pac: 'Procesos PAC', alertas: 'Alertas', cargar: 'Cargar PAC', reporte: 'Reporte' };
+  document.getElementById('topbar-title').textContent = titles[name];
+  if (name === 'pac') { renderTable(); }
+  if (name === 'alertas') renderAlertas();
+  if (name === 'reporte') renderReporte();
+  if (name === 'cargar') renderLoadedFiles();
+}
+
+// ─── File handling ────────────────────────────────────────────────────────────
+function setupDrag() {
+  const zone = document.getElementById('upload-zone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag'); const f = e.dataTransfer.files[0]; if (f) processFile(f); });
+}
+
+function handleFile(e) {
+  const f = e.target.files[0];
+  if (f) processFile(f);
+  e.target.value = '';
+}
+
+function processFile(file) {
+  const dirSel = document.getElementById('upload-dir').value;
+  const dirCustom = document.getElementById('upload-dir-custom').value.trim();
+  pendingDir = dirSel === '__otro__' ? dirCustom : dirSel;
+  if (!pendingDir) { showToast('Selecciona primero la dirección', 'err'); return; }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'binary', cellDates: true });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+      if (rows.length < 2) { showToast('El archivo está vacío', 'err'); return; }
+      rawHeaders = rows[0].map(h => String(h).trim());
+      rawRows = rows.slice(1).filter(r => r.some(c => c !== ''));
+      showMapper();
+    } catch(err) {
+      showToast('Error leyendo el archivo', 'err');
+    }
+  };
+  reader.readAsBinaryString(file);
+}
+
+function showMapper() {
+  const container = document.getElementById('mapper-fields');
+  container.innerHTML = '';
+  FIELD_DEFS.forEach(f => {
+    const guess = guessColumn(f.key, rawHeaders);
+    const options = rawHeaders.map((h, i) => `<option value="${i}" ${guess === i ? 'selected' : ''}>${h || '(col ' + (i+1) + ')'}</option>`).join('');
+    container.innerHTML += `
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; align-items:center;">
+        <div style="font-size:12px; color:var(--text2);">${f.label}</div>
+        <select class="form-select" id="map-${f.key}" style="padding:5px 8px; font-size:11px;">
+          <option value="-1">— no mapear —</option>
+          ${options}
+        </select>
+      </div>`;
+  });
+  document.getElementById('column-mapper').style.display = 'block';
+}
+
+function guessColumn(key, headers) {
+  const patterns = {
+    num_pac: ['pac', 'número', 'numero', 'código', 'codigo', 'id', 'item'],
+    descripcion: ['descripcion', 'descripción', 'objeto', 'detalle', 'nombre'],
+    tipo: ['tipo', 'modalidad', 'procedimiento', 'contratacion'],
+    monto: ['monto', 'presupuesto', 'valor', 'referencial', 'precio'],
+    estado: ['estado', 'status', 'situacion'],
+    fase: ['fase', 'etapa', 'stage'],
+    responsable: ['responsable', 'director', 'encargado', 'gestor'],
+    fecha_planificada: ['fecha', 'inicio', 'planificada', 'programada'],
+    fecha_fin: ['fin', 'termino', 'término', 'finalizacion'],
+    partida: ['partida', 'presupuestaria', 'cuenta'],
+    cpc: ['cpc', 'clasificador', 'cabys']
+  };
+  const pats = patterns[key] || [];
+  for (let i = 0; i < headers.length; i++) {
+    const h = headers[i].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (pats.some(p => h.includes(p))) return i;
+  }
+  return -1;
+}
+
+function importMappedData() {
+  const mapping = {};
+  FIELD_DEFS.forEach(f => {
+    const sel = document.getElementById('map-' + f.key);
+    if (sel) mapping[f.key] = parseInt(sel.value);
+  });
+
+  const newRecords = rawRows.map((row, idx) => {
+    const rec = { _id: Date.now() + idx, _dir: pendingDir, tramite_edoc: '', estado_edoc: '', fase_edoc: '' };
+    FIELD_DEFS.forEach(f => {
+      const ci = mapping[f.key];
+      if (ci >= 0 && ci < row.length) {
+        let val = row[ci];
+        if (val instanceof Date) val = val.toISOString().slice(0, 10);
+        rec[f.key] = String(val).trim();
+      } else {
+        rec[f.key] = '';
+      }
+    });
+    // Normalizar monto
+    if (rec.monto) {
+      const n = parseFloat(String(rec.monto).replace(/[^0-9.-]/g, ''));
+      rec.monto = isNaN(n) ? 0 : n;
+    }
+    return rec;
+  }).filter(r => r.descripcion || r.num_pac);
+
+  if (!newRecords.length) { showToast('No se encontraron filas válidas', 'err'); return; }
+
+  // Reemplaza registros de esa dirección
+  allData = allData.filter(r => r._dir !== pendingDir);
+  allData = allData.concat(newRecords);
+  saveToStorage();
+  document.getElementById('column-mapper').style.display = 'none';
+  refreshAll();
+  showToast(`${newRecords.length} procesos importados de ${pendingDir}`, 'ok');
+  renderLoadedFiles();
+}
+
+// ─── Loaded files list ────────────────────────────────────────────────────────
+function renderLoadedFiles() {
+  const dirs = [...new Set(allData.map(r => r._dir))];
+  const el = document.getElementById('loaded-files-list');
+  const empty = document.getElementById('loaded-files-empty');
+  if (!dirs.length) { el.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  el.innerHTML = dirs.map(d => {
+    const count = allData.filter(r => r._dir === d).length;
+    const budget = allData.filter(r => r._dir === d).reduce((s, r) => s + (r.monto || 0), 0);
+    return `
+    <div style="display:flex; align-items:center; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:8px; gap:12px;">
+      <div style="flex:1;">
+        <div style="font-size:13px; font-weight:500; color:var(--text);">${d}</div>
+        <div style="font-size:11px; color:var(--text3); margin-top:2px; font-family:var(--mono);">${count} procesos · ${formatMoney(budget)}</div>
+      </div>
+      <button class="btn" style="font-size:11px; padding:5px 10px;" onclick="removeDir('${d}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+        Eliminar
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function removeDir(dir) {
+  if (!confirm(`¿Eliminar todos los datos de "${dir}"?`)) return;
+  allData = allData.filter(r => r._dir !== dir);
+  saveToStorage();
+  refreshAll();
+  renderLoadedFiles();
+  showToast(`Datos de "${dir}" eliminados`, 'ok');
+}
+
+// ─── Refresh all ──────────────────────────────────────────────────────────────
+function refreshAll() {
+  updateMetrics();
+  updateTopbar();
+  updateFilters();
+  renderSummaryCharts();
+  const hasData = allData.length > 0;
+  document.getElementById('resumen-empty').style.display = hasData ? 'none' : 'block';
+  document.getElementById('summary-charts').style.display = hasData ? 'grid' : 'none';
+  const badge = document.getElementById('alert-badge');
+  const sinEdoc = allData.filter(r => !r.tramite_edoc).length;
+  if (sinEdoc > 0) { badge.textContent = sinEdoc; badge.style.display = 'inline-block'; }
+  else badge.style.display = 'none';
+}
+
+function updateMetrics() {
+  const total = allData.length;
+  const sinIniciar = allData.filter(r => !r.estado || r.estado === 'Sin iniciar').length;
+  const enProceso = allData.filter(r => ['En proceso','Publicado SERCOP','En evaluación'].includes(r.estado)).length;
+  const finalizados = allData.filter(r => ['Adjudicado','Finalizado'].includes(r.estado)).length;
+  const conEdoc = allData.filter(r => r.tramite_edoc).length;
+  const sinEdoc = total - conEdoc;
+  const dirs = [...new Set(allData.map(r => r._dir))].length;
+  const presupuesto = allData.reduce((s, r) => s + (r.monto || 0), 0);
+  set('m-total', total);
+  set('m-presupuesto', formatMoney(presupuesto));
+  set('m-sin-iniciar', sinIniciar);
+  set('m-en-proceso', enProceso);
+  set('m-finalizados', finalizados);
+  set('m-con-edoc', conEdoc);
+  set('m-sin-edoc', sinEdoc);
+  set('m-dirs', dirs);
+}
+
+function updateTopbar() {
+  set('top-total', allData.length);
+  set('top-presupuesto', formatMoney(allData.reduce((s, r) => s + (r.monto || 0), 0)));
+  set('top-dirs', [...new Set(allData.map(r => r._dir))].length);
+}
+
+function updateFilters() {
+  const dirs = [...new Set(allData.map(r => r._dir))].sort();
+  const tipos = [...new Set(allData.map(r => r.tipo).filter(Boolean))].sort();
+  const estados = [...new Set(allData.map(r => r.estado).filter(Boolean))].sort();
+  fillSelect('pac-filter-dir', dirs, 'Todas las direcciones');
+  fillSelect('pac-filter-tipo', tipos, 'Todos los tipos');
+  fillSelect('pac-filter-estado', estados, 'Todos los estados');
+}
+
+function fillSelect(id, options, placeholder) {
+  const sel = document.getElementById(id);
+  const cur = sel.value;
+  sel.innerHTML = `<option value="">${placeholder}</option>` + options.map(o => `<option value="${o}" ${o === cur ? 'selected' : ''}>${o}</option>`).join('');
+}
+
+// ─── Summary charts ───────────────────────────────────────────────────────────
+function renderSummaryCharts() {
+  renderBarChart('chart-direcciones', countBy('_dir'), '#4f7cff');
+  renderBarChart('chart-tipos', countBy('tipo'), '#14b8a6');
+  renderBarChart('chart-estados', countBy('estado'), '#a855f7');
+  renderPresupuestoChart();
+}
+
+function countBy(field) {
+  const map = {};
+  allData.forEach(r => { const v = r[field] || 'N/D'; map[v] = (map[v] || 0) + 1; });
+  return Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 6);
+}
+
+function renderBarChart(id, data, color) {
+  if (!data.length) return;
+  const max = Math.max(...data.map(d => d[1]));
+  document.getElementById(id).innerHTML = data.map(([label, count]) => `
+    <div class="bar-row">
+      <div class="bar-label" title="${label}">${label}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(count/max*100)}%; background:${color};"></div></div>
+      <div class="bar-count">${count}</div>
+    </div>`).join('');
+}
+
+function renderPresupuestoChart() {
+  const map = {};
+  allData.forEach(r => { const d = r._dir || 'N/D'; map[d] = (map[d] || 0) + (r.monto || 0); });
+  const data = Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const max = Math.max(...data.map(d => d[1]));
+  document.getElementById('chart-presupuesto').innerHTML = data.map(([label, val]) => `
+    <div class="bar-row">
+      <div class="bar-label" title="${label}">${label}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${max > 0 ? Math.round(val/max*100) : 0}%; background:#f59e0b;"></div></div>
+      <div class="bar-count" style="width:60px;">${formatMoney(val, true)}</div>
+    </div>`).join('');
+}
+
+// ─── Table ────────────────────────────────────────────────────────────────────
+function filterTable() {
+  const search = (document.getElementById('pac-search').value || '').toLowerCase();
+  const dir = document.getElementById('pac-filter-dir').value;
+  const tipo = document.getElementById('pac-filter-tipo').value;
+  const estado = document.getElementById('pac-filter-estado').value;
+  const edoc = document.getElementById('pac-filter-edoc').value;
+
+  filteredData = allData.filter(r => {
+    if (dir && r._dir !== dir) return false;
+    if (tipo && r.tipo !== tipo) return false;
+    if (estado && r.estado !== estado) return false;
+    if (edoc === 'con' && !r.tramite_edoc) return false;
+    if (edoc === 'sin' && r.tramite_edoc) return false;
+    if (search) {
+      const hay = [r.num_pac, r.descripcion, r.responsable, r.tipo, r.estado, r._dir, r.tramite_edoc].join(' ').toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  if (sortField) {
+    filteredData.sort((a, b) => {
+      let va = a[sortField] || '', vb = b[sortField] || '';
+      if (sortField === 'monto') { va = a.monto || 0; vb = b.monto || 0; }
+      return va < vb ? -sortDir : va > vb ? sortDir : 0;
+    });
+  }
+  currentPage = 1;
+  renderTable();
+}
+
+function sortBy(field) {
+  if (sortField === field) sortDir *= -1; else { sortField = field; sortDir = 1; }
+  filterTable();
+}
+
+function renderTable() {
+  if (!filteredData.length) filteredData = [...allData];
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const page = filteredData.slice(start, start + PAGE_SIZE);
+  const total = filteredData.length;
+  document.getElementById('page-info').textContent = `${start + 1}–${Math.min(start + PAGE_SIZE, total)} de ${total}`;
+  document.getElementById('prev-btn').disabled = currentPage === 1;
+  document.getElementById('next-btn').disabled = start + PAGE_SIZE >= total;
+
+  document.getElementById('pac-tbody').innerHTML = page.map(r => {
+    const estadoColor = ESTADO_COLORS[r.estado] || 'gray';
+    const edocCell = r.tramite_edoc
+      ? `<div class="edoc-cell"><a class="edoc-link" href="${EDOC_BASE}${r.tramite_edoc}" target="_blank">#${r.tramite_edoc}</a><span class="edoc-add-btn" onclick="openEdocModal(${r._id})" title="Editar">✎</span></div>`
+      : `<div class="edoc-cell"><span class="edoc-add-btn" onclick="openEdocModal(${r._id})" title="Vincular trámite">＋</span><span style="font-size:11px;color:var(--text3);margin-left:4px;">Sin vínculo</span></div>`;
+    return `
+    <tr>
+      <td class="mono col-num">${esc(r.num_pac)}</td>
+      <td class="col-dir" style="max-width:140px;" title="${esc(r._dir)}"><span class="badge blue">${esc(shortDir(r._dir))}</span></td>
+      <td class="primary col-desc" title="${esc(r.descripcion)}">${esc(r.descripcion).substring(0, 60)}${r.descripcion && r.descripcion.length > 60 ? '…' : ''}</td>
+      <td class="col-tipo">${r.tipo ? `<span class="badge teal">${esc(r.tipo).substring(0,20)}</span>` : '<span class="badge gray">N/D</span>'}</td>
+      <td class="col-monto mono" style="text-align:right;">${r.monto ? formatMoney(r.monto) : '—'}</td>
+      <td class="col-estado">${r.estado ? `<span class="badge ${estadoColor}">${esc(r.estado)}</span>` : '<span class="badge gray">N/D</span>'}</td>
+      <td class="col-fase" style="color:var(--text2); font-size:11px;">${esc(r.fase || '—')}</td>
+      <td class="col-resp" title="${esc(r.responsable)}" style="font-size:11px;">${esc((r.responsable || '—').substring(0, 22))}</td>
+      <td class="col-fecha mono" style="font-size:11px;">${esc(r.fecha_planificada || '—')}</td>
+      <td class="col-edoc">${edocCell}</td>
+    </tr>`;
+  }).join('');
+}
+
+function changePage(dir) {
+  currentPage += dir;
+  renderTable();
+}
+
+// ─── e-DOC Modal ──────────────────────────────────────────────────────────────
+function openEdocModal(id) {
+  editingId = id;
+  const r = allData.find(x => x._id === id);
+  if (!r) return;
+  document.getElementById('modal-edoc-sub').textContent = r.descripcion ? r.descripcion.substring(0, 80) + (r.descripcion.length > 80 ? '…' : '') : 'Proceso PAC';
+  document.getElementById('edoc-input').value = r.tramite_edoc || '';
+  document.getElementById('edoc-estado-select').value = r.estado || 'Sin iniciar';
+  document.getElementById('edoc-fase-input').value = r.fase || '';
+  document.getElementById('modal-edoc').classList.add('open');
+  setTimeout(() => document.getElementById('edoc-input').focus(), 50);
+}
+function closeEdocModal() { document.getElementById('modal-edoc').classList.remove('open'); editingId = null; }
+function saveEdocLink() {
+  const r = allData.find(x => x._id === editingId);
+  if (!r) return;
+  r.tramite_edoc = document.getElementById('edoc-input').value.trim();
+  r.estado = document.getElementById('edoc-estado-select').value;
+  r.fase = document.getElementById('edoc-fase-input').value.trim();
+  saveToStorage();
+  closeEdocModal();
+  refreshAll();
+  renderTable();
+  showToast('Vínculo guardado', 'ok');
+}
+document.getElementById('modal-edoc').addEventListener('click', e => { if (e.target === document.getElementById('modal-edoc')) closeEdocModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEdocModal(); });
+
+// ─── Alertas ──────────────────────────────────────────────────────────────────
+function renderAlertas() {
+  const sinEdoc = allData.filter(r => !r.tramite_edoc);
+  const desiertos = allData.filter(r => r.estado === 'Desierto');
+  const container = document.getElementById('alertas-container');
+  const empty = document.getElementById('alertas-empty');
+  if (!sinEdoc.length && !desiertos.length) { container.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  let html = '';
+  if (sinEdoc.length) {
+    html += `<h3 style="font-size:11px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:var(--red);font-family:var(--mono);margin-bottom:12px;">${sinEdoc.length} procesos sin vínculo e-DOC</h3>`;
+    html += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-bottom:24px;">` +
+      sinEdoc.slice(0, 30).map(r => `
+      <div style="background:var(--bg2);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:14px;">
+        <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;">${esc(r.descripcion.substring(0,70))}…</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;font-family:var(--mono);">${esc(r._dir)} · ${esc(r.num_pac || 'S/N')}</div>
+        <button class="btn" style="font-size:11px;padding:4px 10px;" onclick="showView('pac');setTimeout(()=>openEdocModal(${r._id}),100)">
+          Vincular e-DOC
+        </button>
+      </div>`).join('') + `</div>`;
+  }
+  if (desiertos.length) {
+    html += `<h3 style="font-size:11px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:var(--orange);font-family:var(--mono);margin-bottom:12px;">${desiertos.length} procesos desiertos</h3>`;
+    html += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;">` +
+      desiertos.map(r => `
+      <div style="background:var(--bg2);border:1px solid rgba(249,115,22,0.2);border-radius:8px;padding:14px;">
+        <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px;">${esc(r.descripcion.substring(0,70))}…</div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);">${esc(r._dir)}</div>
+      </div>`).join('') + `</div>`;
+  }
+  container.innerHTML = html;
+}
+
+// ─── Reporte ──────────────────────────────────────────────────────────────────
+function renderReporte() {
+  const dirs = [...new Set(allData.map(r => r._dir))];
+  const total = allData.length;
+  const presupuesto = allData.reduce((s, r) => s + (r.monto || 0), 0);
+  const conEdoc = allData.filter(r => r.tramite_edoc).length;
+  const fecha = new Date().toLocaleDateString('es-EC', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  let html = `
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:20px;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <h2 style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:4px;">Reporte PAC — Compras Públicas GADMR</h2>
+        <div style="font-size:12px;color:var(--text3);font-family:var(--mono);">Generado: ${fecha} · ${dirs.length} direcciones</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+      <div style="background:var(--bg3);border-radius:8px;padding:12px;">
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Total procesos</div>
+        <div style="font-size:22px;font-weight:300;font-family:var(--mono);color:var(--accent);">${total}</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px;">
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Presupuesto</div>
+        <div style="font-size:22px;font-weight:300;font-family:var(--mono);color:var(--text);">${formatMoney(presupuesto)}</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px;">
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Con vínculo e-DOC</div>
+        <div style="font-size:22px;font-weight:300;font-family:var(--mono);color:var(--teal);">${conEdoc}</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px;">
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Sin vínculo</div>
+        <div style="font-size:22px;font-weight:300;font-family:var(--mono);color:var(--red);">${total - conEdoc}</div>
+      </div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--border);">
+          <th style="text-align:left;padding:8px 10px;font-size:10px;color:var(--text3);font-family:var(--mono);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Dirección</th>
+          <th style="text-align:right;padding:8px 10px;font-size:10px;color:var(--text3);font-family:var(--mono);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Procesos</th>
+          <th style="text-align:right;padding:8px 10px;font-size:10px;color:var(--text3);font-family:var(--mono);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Presupuesto</th>
+          <th style="text-align:right;padding:8px 10px;font-size:10px;color:var(--text3);font-family:var(--mono);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Con e-DOC</th>
+          <th style="text-align:right;padding:8px 10px;font-size:10px;color:var(--text3);font-family:var(--mono);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Sin e-DOC</th>
+          <th style="text-align:center;padding:8px 10px;font-size:10px;color:var(--text3);font-family:var(--mono);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Avance</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${dirs.map(d => {
+          const rows = allData.filter(r => r._dir === d);
+          const budget = rows.reduce((s, r) => s + (r.monto || 0), 0);
+          const linked = rows.filter(r => r.tramite_edoc).length;
+          const pct = rows.length ? Math.round(linked / rows.length * 100) : 0;
+          return `<tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:9px 10px;font-size:12px;color:var(--text);">${esc(d)}</td>
+            <td style="padding:9px 10px;font-size:12px;color:var(--text);text-align:right;font-family:var(--mono);">${rows.length}</td>
+            <td style="padding:9px 10px;font-size:12px;color:var(--text);text-align:right;font-family:var(--mono);">${formatMoney(budget)}</td>
+            <td style="padding:9px 10px;font-size:12px;color:var(--teal);text-align:right;font-family:var(--mono);">${linked}</td>
+            <td style="padding:9px 10px;font-size:12px;color:var(--red);text-align:right;font-family:var(--mono);">${rows.length - linked}</td>
+            <td style="padding:9px 10px;text-align:center;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:var(--teal);border-radius:2px;"></div></div>
+                <span style="font-size:10px;font-family:var(--mono);color:var(--text2);min-width:28px;">${pct}%</span>
+              </div>
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+  document.getElementById('reporte-body').innerHTML = html;
+}
+
+// ─── Export ───────────────────────────────────────────────────────────────────
+function exportExcel() {
+  if (!allData.length) { showToast('Sin datos para exportar', 'err'); return; }
+  const rows = allData.map(r => ({
+    'Dirección': r._dir,
+    '#PAC': r.num_pac,
+    'Descripción': r.descripcion,
+    'Tipo': r.tipo,
+    'Monto Referencial': r.monto,
+    'Estado': r.estado,
+    'Fase': r.fase,
+    'Responsable': r.responsable,
+    'Fecha Planificada': r.fecha_planificada,
+    'Partida': r.partida,
+    'CPC': r.cpc,
+    'Trámite e-DOC': r.tramite_edoc,
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'PAC Consolidado');
+  XLSX.writeFile(wb, `PAC_GADMR_${new Date().toISOString().slice(0,10)}.xlsx`);
+  showToast('Exportado correctamente', 'ok');
+}
+
+// ─── Chat ─────────────────────────────────────────────────────────────────────
+function toggleChat() {
+  chatVisible = !chatVisible;
+  document.getElementById('chat-panel').classList.toggle('hidden', !chatVisible);
+}
+
+function chatKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  const apiKey = localStorage.getItem('pac_apikey');
+
+  appendMsg('user', msg);
+  input.value = '';
+
+  if (!apiKey) {
+    appendMsg('ai', 'Para usar el asistente Claude, agrega tu API Key en la parte inferior del menú lateral.');
+    return;
+  }
+
+  const typing = appendMsg('ai', '<div class="typing-dot"><span></span><span></span><span></span></div>');
+
+  const summary = buildDataSummary();
+  const system = `Eres un asistente especializado en compras públicas del GADMR (Gobierno Autónomo Descentralizado Municipal de Riobamba), Ecuador. Analizas el Plan Anual de Contratación (PAC) y procesos de contratación. Responde siempre en español, de forma concisa y útil. El e-DOC es el sistema interno de gestión documental. SERCOP es el portal nacional de compras públicas de Ecuador.
+
+Estado actual del PAC cargado:
+${summary}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1000,
+        system,
+        messages: [{ role: 'user', content: msg }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || 'Sin respuesta';
+    typing.querySelector('.bubble').innerHTML = text.replace(/\n/g, '<br>');
+  } catch(err) {
+    typing.querySelector('.bubble').textContent = 'Error al conectar con Claude. Verifica la API key.';
+  }
+}
+
+function buildDataSummary() {
+  if (!allData.length) return 'No hay datos del PAC cargados.';
+  const dirs = [...new Set(allData.map(r => r._dir))];
+  const total = allData.length;
+  const presupuesto = allData.reduce((s, r) => s + (r.monto || 0), 0);
+  const conEdoc = allData.filter(r => r.tramite_edoc).length;
+  const estados = {};
+  allData.forEach(r => { const e = r.estado || 'N/D'; estados[e] = (estados[e] || 0) + 1; });
+  return `Total: ${total} procesos | Presupuesto: ${formatMoney(presupuesto)} | Con vínculo e-DOC: ${conEdoc} | Sin vínculo: ${total - conEdoc}
+Direcciones: ${dirs.join(', ')}
+Estados: ${Object.entries(estados).map(([k,v]) => `${k}: ${v}`).join(', ')}`;
+}
+
+function appendMsg(role, html) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `chat-msg ${role}`;
+  div.innerHTML = `<div class="bubble">${html}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+// ─── Utils ────────────────────────────────────────────────────────────────────
+function set(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function formatMoney(n, short = false) {
+  if (!n) return '$0';
+  if (short && n >= 1000) return '$' + (n/1000).toFixed(0) + 'k';
+  return '$' + Math.round(n).toLocaleString('es-EC');
+}
+function shortDir(dir) {
+  const map = {
+    'Dirección de Obras Públicas': 'Obras',
+    'Dirección de Planificación': 'Planif.',
+    'Dirección Financiera': 'Finanzas',
+    'Dirección Administrativa': 'Admin.',
+    'Dirección Jurídica': 'Jurídica',
+    'Secretaría General': 'Secretaría',
+    'Unidad de Compras Públicas': 'Compras',
+    'Unidad de TIC': 'TIC',
+    'Gestión Ambiental': 'Ambiental',
+  };
+  return map[dir] || (dir ? dir.substring(0, 10) : '—');
+}
+function showToast(msg, type = 'ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `show ${type}`;
+  setTimeout(() => t.className = '', 2800);
+}
+</script>
+</body>
+</html>
