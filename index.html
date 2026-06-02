@@ -666,8 +666,31 @@ function processFile(file) {
       const ws = wb.Sheets[wb.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
       if (rows.length < 2) { showToast('El archivo está vacío', 'err'); return; }
-      rawHeaders = rows[0].map(h => String(h).trim());
-      rawRows = rows.slice(1).filter(r => r.some(c => c !== ''));
+      // Buscar la fila real de encabezados (PAC SERCOP tiene filas de título antes)
+      // La fila de encabezados tiene columnas clave como DETALLE_PRODUCTO, COSTO, etc.
+      const HEADER_KEYS = ['detalle_producto','tipo_compra','costo','codigo_cpc','cuenta_contable','procedimiento_sugerido','descripcion','monto','tipo'];
+      let headerRowIdx = 0;
+      for (let i = 0; i < Math.min(rows.length, 15); i++) {
+        const rowText = rows[i].map(c => String(c).toLowerCase().trim().replace(/\s+/g,'_'));
+        const matches = HEADER_KEYS.filter(k => rowText.some(c => c.includes(k.split('_')[0])));
+        if (matches.length >= 2) { headerRowIdx = i; break; }
+      }
+      rawHeaders = rows[headerRowIdx].map(h => String(h).trim());
+      // Filtrar filas vacías y filas de pie (ELABORADO POR, firmas, etc.)
+      const FOOTER_WORDS = ['elaborado','revisado','aprobado','analista','director','firma','mgs','ing','lcdo'];
+      rawRows = rows.slice(headerRowIdx + 1).filter(r => {
+        if (!r.some(c => c !== '')) return false;
+        const first = String(r[0] || '').toLowerCase().trim();
+        const second = String(r[1] || '').toLowerCase().trim();
+        // Descartar filas de pie de página / firmas
+        if (FOOTER_WORDS.some(w => first.includes(w) || second.includes(w))) return false;
+        // Descartar filas donde la primera celda no es año ni vacía
+        if (first && !/^20\d{2}$/.test(first) && !/^\d{2}[\.\-]/.test(first)) {
+          // Permitir si tiene contenido útil en otras columnas
+          if (!r[3] && !r[4]) return false;
+        }
+        return true;
+      });
       showMapper();
     } catch(err) {
       showToast('Error leyendo el archivo', 'err');
@@ -695,23 +718,29 @@ function showMapper() {
 }
 
 function guessColumn(key, headers) {
-  const patterns = {
-    num_pac: ['pac', 'número', 'numero', 'código', 'codigo', 'id', 'item'],
-    descripcion: ['descripcion', 'descripción', 'objeto', 'detalle', 'nombre'],
-    tipo: ['tipo', 'modalidad', 'procedimiento', 'contratacion'],
-    monto: ['monto', 'presupuesto', 'valor', 'referencial', 'precio'],
-    estado: ['estado', 'status', 'situacion'],
-    fase: ['fase', 'etapa', 'stage'],
-    responsable: ['responsable', 'director', 'encargado', 'gestor'],
-    fecha_planificada: ['fecha', 'inicio', 'planificada', 'programada'],
-    fecha_fin: ['fin', 'termino', 'término', 'finalizacion'],
-    partida: ['partida', 'presupuestaria', 'cuenta'],
-    cpc: ['cpc', 'clasificador', 'cabys']
+  // Mapeo exacto para columnas del PAC SERCOP
+  const exact = {
+    num_pac:            ['ano', 'ano', 'item', 'numero_pac', 'num_pac'],
+    descripcion:        ['detalle_producto', 'descripcion', 'descripcion', 'objeto', 'detalle', 'nombre_producto'],
+    tipo:               ['tipo_compra', 'tipo_contratacion', 'tipo'],
+    monto:              ['costo', 'monto', 'presupuesto_referencial', 'valor', 'presupuesto'],
+    estado:             ['estado', 'status', 'situacion'],
+    fase:               ['procedimiento_sugerido', 'fase', 'etapa', 'procedimiento'],
+    responsable:        ['responsable', 'director', 'encargado', 'unidad_requirente'],
+    fecha_planificada:  ['cuatrimestre_i', 'fecha_inicio', 'fecha_planificada', 'mes_inicio'],
+    fecha_fin:          ['cuatrimestre_iii', 'fecha_fin', 'fecha_termino'],
+    partida:            ['cuenta_contable', 'partida', 'partida_presupuestaria'],
+    cpc:                ['codigo_cpc', 'cpc', 'clasificador']
   };
-  const pats = patterns[key] || [];
+  const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'_');
+  const pats = exact[key] || [];
   for (let i = 0; i < headers.length; i++) {
-    const h = headers[i].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    if (pats.some(p => h.includes(p))) return i;
+    const h = norm(headers[i]);
+    if (pats.includes(h)) return i;
+  }
+  for (let i = 0; i < headers.length; i++) {
+    const h = norm(headers[i]);
+    if (pats.some(p => h.includes(p) || p.includes(h))) return i;
   }
   return -1;
 }
