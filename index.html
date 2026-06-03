@@ -3,386 +3,282 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PAC Monitor — GADMR Obras Públicas</title>
+<title>PAC Monitor — GADMR Obras Públicas 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --azul:#003B8E;
-  --azul2:#0056CC;
-  --azul3:#1a6de0;
-  --azulclaro:#E8F0FB;
-  --rojo:#C8102E;
-  --rojo2:#e01a3a;
-  --bg:#F4F6FA;
-  --white:#ffffff;
-  --border:#DDE3EE;
-  --text:#1a2340;
-  --text2:#5a6380;
-  --text3:#8892aa;
-  --green:#0a8754;
-  --green-bg:#e6f4ee;
-  --yellow:#b45309;
-  --yellow-bg:#fef3c7;
-  --red:#C8102E;
-  --red-bg:#fde8ec;
-  --gray:#64748b;
-  --gray-bg:#f1f5f9;
-  --shadow:0 1px 3px rgba(0,59,142,0.08),0 4px 16px rgba(0,59,142,0.06);
-  --shadow2:0 2px 8px rgba(0,59,142,0.12);
-  --sidebar:240px;
-  --sans:'Inter',sans-serif;
+  --azul:#003B8E;--azul2:#0056CC;--azulclaro:#E8F0FB;
+  --rojo:#C8102E;--bg:#F4F6FA;--white:#fff;
+  --border:#DDE3EE;--text:#1a2340;--text2:#5a6380;--text3:#8892aa;
+  --green:#0a8754;--green-bg:#e6f4ee;
+  --shadow:0 1px 4px rgba(0,59,142,0.08),0 4px 16px rgba(0,59,142,0.05);
+  --sidebar:242px;--sans:'Inter',sans-serif;
 }
 html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px}
 #app{display:flex;height:100vh;overflow:hidden}
-
 /* SIDEBAR */
-#sidebar{width:var(--sidebar);background:var(--azul);display:flex;flex-direction:column;flex-shrink:0;box-shadow:2px 0 8px rgba(0,0,0,0.15)}
-.logo-wrap{padding:18px 16px 16px;border-bottom:1px solid rgba(255,255,255,0.1)}
-.logo-escudo{font-size:28px;line-height:1;margin-bottom:6px}
-.logo-title{font-size:12px;font-weight:700;color:#fff;letter-spacing:0.04em;line-height:1.3}
-.logo-sub{font-size:10px;color:rgba(255,255,255,0.55);margin-top:2px;letter-spacing:0.02em}
-.logo-year{display:inline-block;margin-top:6px;background:var(--rojo);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:0.06em}
-.nav-sect{padding:14px 14px 4px;font-size:9px;font-weight:700;letter-spacing:0.14em;color:rgba(255,255,255,0.35);text-transform:uppercase}
-.nav-item{display:flex;align-items:center;gap:9px;padding:9px 14px;border-radius:0;cursor:pointer;color:rgba(255,255,255,0.7);font-size:12.5px;font-weight:500;transition:all 0.15s;border-left:3px solid transparent;margin:1px 0}
-.nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
-.nav-item.active{background:rgba(255,255,255,0.12);color:#fff;border-left-color:var(--rojo)}
-.nav-item svg{width:15px;height:15px;flex-shrink:0;opacity:0.8}
-.nav-item.active svg{opacity:1}
-.nav-badge{margin-left:auto;background:var(--rojo);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;min-width:20px;text-align:center}
-.sidebar-bottom{margin-top:auto;padding:12px 14px;border-top:1px solid rgba(255,255,255,0.1)}
-.apikey-label{font-size:9px;font-weight:600;letter-spacing:0.1em;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:5px}
-.apikey-input{width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:5px;padding:6px 9px;font-size:11px;color:rgba(255,255,255,0.8);font-family:monospace}
-.apikey-input:focus{outline:none;border-color:rgba(255,255,255,0.4)}
-.apikey-input::placeholder{color:rgba(255,255,255,0.25)}
-
-/* TOPBAR */
-#topbar{height:56px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px;flex-shrink:0;box-shadow:0 1px 3px rgba(0,59,142,0.06)}
-.topbar-line{width:4px;height:28px;background:var(--rojo);border-radius:2px;flex-shrink:0}
-.topbar-title{font-size:15px;font-weight:600;color:var(--text);flex:1}
-.topbar-subtitle{font-size:11px;color:var(--text3);margin-top:1px}
-.topbar-meta{display:flex;gap:20px}
-.topbar-stat{font-size:11px;color:var(--text2)}
-.topbar-stat strong{color:var(--azul);font-weight:600}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;border:1px solid var(--border);background:var(--white);color:var(--text2);cursor:pointer;font-size:12px;font-weight:500;font-family:var(--sans);transition:all 0.15s;white-space:nowrap}
-.btn:hover{background:var(--bg);border-color:#c0c9de;color:var(--text)}
-.btn.primary{background:var(--azul);border-color:var(--azul);color:#fff}
-.btn.primary:hover{background:var(--azul2)}
-.btn.danger{background:var(--rojo);border-color:var(--rojo);color:#fff}
-.btn svg{width:14px;height:14px}
-
+#sb{width:var(--sidebar);background:var(--azul);display:flex;flex-direction:column;flex-shrink:0}
+.logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.1)}
+.logo-icon{font-size:26px;margin-bottom:6px}
+.logo-title{font-size:13px;font-weight:700;color:#fff;letter-spacing:.02em}
+.logo-sub{font-size:10px;color:rgba(255,255,255,.5);margin-top:1px}
+.logo-tag{display:inline-block;margin-top:7px;background:var(--rojo);color:#fff;font-size:10px;font-weight:700;padding:2px 10px;border-radius:3px}
+.ns{padding:14px 14px 4px;font-size:9px;font-weight:700;letter-spacing:.14em;color:rgba(255,255,255,.3);text-transform:uppercase}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 14px;cursor:pointer;color:rgba(255,255,255,.65);font-size:12.5px;font-weight:500;transition:all .15s;border-left:3px solid transparent}
+.ni:hover{background:rgba(255,255,255,.07);color:#fff}
+.ni.on{background:rgba(255,255,255,.11);color:#fff;border-left-color:var(--rojo)}
+.ni svg{width:15px;height:15px;flex-shrink:0;opacity:.75}
+.ni.on svg{opacity:1}
+.nbadge{margin-left:auto;background:var(--rojo);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px}
+.sb-bottom{margin-top:auto;padding:12px 14px;border-top:1px solid rgba(255,255,255,.1)}
+.aklabel{font-size:9px;font-weight:600;letter-spacing:.1em;color:rgba(255,255,255,.35);text-transform:uppercase;margin-bottom:5px}
+.akinput{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:5px;padding:6px 9px;font-size:11px;color:rgba(255,255,255,.75);font-family:monospace}
+.akinput::placeholder{color:rgba(255,255,255,.2)}
+.akinput:focus{outline:none;border-color:rgba(255,255,255,.35)}
 /* MAIN */
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-#content{flex:1;overflow-y:auto;padding:20px 24px}
-
-/* CARDS MÉTRICAS */
-.metrics-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
-.mcard{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
-.mcard::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--azul)}
-.mcard.red::before{background:var(--rojo)}
-.mcard.green::before{background:var(--green)}
-.mcard.yellow::before{background:#d97706}
-.mcard.gray::before{background:#94a3b8}
-.mcard-label{font-size:10px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
-.mcard-val{font-size:26px;font-weight:300;color:var(--text);line-height:1}
-.mcard.red .mcard-val{color:var(--rojo)}
-.mcard.green .mcard-val{color:var(--green)}
-.mcard.yellow .mcard-val{color:#d97706}
-.mcard-sub{font-size:10px;color:var(--text3);margin-top:4px}
-
+#topbar{height:54px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:12px;flex-shrink:0;box-shadow:0 1px 3px rgba(0,59,142,0.06)}
+.tb-bar{width:4px;height:26px;background:var(--rojo);border-radius:2px}
+.tb-title{font-size:14px;font-weight:600;color:var(--text);flex:1}
+.tb-stat{font-size:11px;color:var(--text2)}
+.tb-stat strong{color:var(--azul);font-weight:600}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;border:1px solid var(--border);background:var(--white);color:var(--text2);cursor:pointer;font-size:12px;font-weight:500;font-family:var(--sans);transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--bg);border-color:#b8c4d8}
+.btn.pri{background:var(--azul);border-color:var(--azul);color:#fff}
+.btn.pri:hover{background:var(--azul2)}
+.btn svg{width:14px;height:14px}
+#content{flex:1;overflow-y:auto;padding:22px 24px}
+/* MÉTRICAS */
+.mrow{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
+.mc{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:15px 17px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.mc::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--azul)}
+.mc.r::before{background:var(--rojo)}
+.mc.g::before{background:var(--green)}
+.mc.y::before{background:#d97706}
+.ml{font-size:10px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--text3);margin-bottom:7px}
+.mv{font-size:26px;font-weight:300;color:var(--text);line-height:1}
+.mc.r .mv{color:var(--rojo)}
+.mc.g .mv{color:var(--green)}
+.mc.y .mv{font-size:16px;margin-top:5px}
+.msub{font-size:10px;color:var(--text3);margin-top:4px}
+/* CHARTS */
+.crow{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.cc{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px 18px;box-shadow:var(--shadow)}
+.ct{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text3);margin-bottom:13px;display:flex;align-items:center;gap:7px}
+.ct::before{content:'';width:12px;height:3px;background:var(--azul);border-radius:2px}
+.br{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bl{font-size:11px;color:var(--text2);width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.bt{flex:1;height:7px;background:#edf0f7;border-radius:4px;overflow:hidden}
+.bf{height:100%;border-radius:4px;transition:width .4s ease}
+.bv{font-size:10px;color:var(--text3);min-width:24px;text-align:right}
 /* PANEL */
 .panel{background:var(--white);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
-.panel-header{display:flex;align-items:center;gap:10px;padding:13px 18px;border-bottom:1px solid var(--border);background:var(--white)}
-.panel-title{font-size:13px;font-weight:600;color:var(--text);flex:1}
-.panel-sub{font-size:11px;color:var(--text3)}
-
+.ph{display:flex;align-items:center;gap:10px;padding:13px 18px;border-bottom:1px solid var(--border)}
+.ptitle{font-size:13px;font-weight:600;color:var(--text);flex:1}
 /* TABLA */
-.tbl-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.search-box{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 11px;font-size:12px;color:var(--text);width:220px;font-family:var(--sans)}
-.search-box::placeholder{color:var(--text3)}
-.search-box:focus{outline:none;border-color:var(--azul2);background:#fff}
+.tcontrols{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sb{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 11px;font-size:12px;color:var(--text);width:210px;font-family:var(--sans)}
+.sb::placeholder{color:var(--text3)}
+.sb:focus{outline:none;border-color:var(--azul2);background:#fff}
 .flt{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text2);font-family:var(--sans);cursor:pointer}
 .flt:focus{outline:none;border-color:var(--azul2)}
-.tbl-wrap{overflow-x:auto}
+.twrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse}
-thead th{padding:10px 12px;text-align:left;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--border);background:var(--bg);white-space:nowrap;cursor:pointer;user-select:none}
+thead th{padding:9px 12px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--border);background:var(--bg);white-space:nowrap;cursor:pointer;user-select:none}
 thead th:hover{color:var(--azul)}
-tbody tr{border-bottom:1px solid #f0f3f9;transition:background 0.1s}
+tbody tr{border-bottom:1px solid #f0f3f9;transition:background .1s}
 tbody tr:hover{background:#f8fafd}
-tbody td{padding:10px 12px;font-size:12px;color:var(--text2);max-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-tbody td.main{color:var(--text);font-weight:500;font-size:12.5px}
-tbody td.mono{font-family:monospace;font-size:11px}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:0.04em;white-space:nowrap}
-.badge.obras{background:#dbeafe;color:#1d4ed8}
-.badge.bien{background:#dcfce7;color:#166534}
-.badge.servicio{background:#f3e8ff;color:#6b21a8}
-.badge.consultoria{background:#fff7ed;color:#c2410c}
-.badge.infima{background:#fce7f3;color:#9d174d}
-.badge.otro{background:var(--gray-bg);color:var(--gray)}
-.badge.cuatI{background:#dbeafe;color:#1e40af}
-.badge.cuatII{background:#dcfce7;color:#14532d}
-.badge.cuatIII{background:#fef9c3;color:#854d0e}
-.estado-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.dot-ok{background:var(--green)}
-.dot-warn{background:#d97706}
-.dot-err{background:var(--rojo)}
-.dot-gray{background:#94a3b8}
-
-/* EDOC CELL */
-.edoc-cell{display:flex;align-items:center;gap:5px}
-.edoc-num{color:var(--azul2);font-family:monospace;font-size:11px;font-weight:600;cursor:pointer;text-decoration:none}
-.edoc-num:hover{text-decoration:underline}
-.edoc-status{font-size:10px;color:var(--text3);font-style:italic}
-.btn-edoc-add{width:22px;height:22px;border-radius:5px;background:var(--azulclaro);border:1px solid #c0d4f5;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--azul);font-size:16px;line-height:1;flex-shrink:0;transition:all 0.15s}
-.btn-edoc-add:hover{background:var(--azul);color:#fff;border-color:var(--azul)}
-.btn-edoc-edit{width:20px;height:20px;border-radius:4px;background:transparent;border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);font-size:11px;transition:all 0.15s;flex-shrink:0}
-.btn-edoc-edit:hover{background:var(--azulclaro);border-color:var(--azul2);color:var(--azul)}
-
-/* PAGINACIÓN */
-.pagination{display:flex;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid var(--border);background:var(--bg)}
-.page-btn{padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--white);color:var(--text2);cursor:pointer;font-size:11px;font-family:var(--sans);font-weight:500}
-.page-btn:hover:not(:disabled){background:var(--azulclaro);border-color:var(--azul2);color:var(--azul)}
-.page-btn:disabled{opacity:0.3;cursor:default}
-.page-info{flex:1;text-align:center;font-size:11px;color:var(--text3)}
-
+tbody td{padding:9px 12px;font-size:12px;color:var(--text2)}
+td.main{color:var(--text);font-weight:500}
+td.mono{font-family:monospace;font-size:11px}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+.bObras{background:#dbeafe;color:#1d4ed8}
+.bBien{background:#dcfce7;color:#166534}
+.bServicio{background:#f3e8ff;color:#6b21a8}
+.bConsultoria{background:#fff7ed;color:#c2410c}
+.bInfima{background:#fce7f3;color:#9d174d}
+.bOtro{background:#f1f5f9;color:#64748b}
+.bC1{background:#dbeafe;color:#1e40af}
+.bC2{background:#dcfce7;color:#14532d}
+.bC3{background:#fef9c3;color:#854d0e}
+/* EDOC */
+.ecell{display:flex;align-items:center;gap:5px}
+.elink{color:var(--azul2);font-family:monospace;font-size:11px;font-weight:600;cursor:pointer;text-decoration:none}
+.elink:hover{text-decoration:underline}
+.eadd{width:22px;height:22px;border-radius:5px;background:var(--azulclaro);border:1px solid #c0d4f5;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--azul);font-size:16px;line-height:1;flex-shrink:0;transition:all .15s}
+.eadd:hover{background:var(--azul);color:#fff;border-color:var(--azul)}
+.eedit{width:20px;height:20px;border-radius:4px;background:transparent;border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);font-size:11px;transition:all .15s;flex-shrink:0}
+.eedit:hover{background:var(--azulclaro);border-color:var(--azul2);color:var(--azul)}
+.edot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dok{background:var(--green)}
+.dwarn{background:#d97706}
+.derr{background:var(--rojo)}
+.dgray{background:#94a3b8}
+/* PAGINACION */
+.pag{display:flex;align-items:center;gap:8px;padding:11px 16px;border-top:1px solid var(--border);background:var(--bg)}
+.pb{padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--white);color:var(--text2);cursor:pointer;font-size:11px;font-family:var(--sans);font-weight:500}
+.pb:hover:not(:disabled){background:var(--azulclaro);border-color:var(--azul2);color:var(--azul)}
+.pb:disabled{opacity:.3;cursor:default}
+.pi{flex:1;text-align:center;font-size:11px;color:var(--text3)}
 /* MODAL */
-.overlay{position:fixed;inset:0;background:rgba(0,30,80,0.4);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(3px)}
-.overlay.open{display:flex}
-.modal{background:#fff;border-radius:12px;padding:0;width:460px;max-width:95vw;box-shadow:0 20px 60px rgba(0,30,80,0.25);overflow:hidden}
-.modal-head{background:var(--azul);padding:18px 22px;display:flex;align-items:center;gap:10px}
-.modal-head-title{font-size:14px;font-weight:600;color:#fff;flex:1}
-.modal-head-close{width:28px;height:28px;border-radius:6px;background:rgba(255,255,255,0.1);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1}
-.modal-head-close:hover{background:rgba(255,255,255,0.2)}
-.modal-body{padding:20px 22px}
-.modal-desc{font-size:12px;color:var(--text2);background:var(--bg);border-radius:6px;padding:10px 12px;margin-bottom:16px;line-height:1.5;border-left:3px solid var(--azul)}
-.form-row{margin-bottom:14px}
-.form-label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px;letter-spacing:0.03em}
-.form-input{width:100%;border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--text);font-family:var(--sans);background:#fff}
-.form-input:focus{outline:none;border-color:var(--azul2);box-shadow:0 0 0 3px rgba(0,86,204,0.1)}
-.form-select{width:100%;border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--text);font-family:var(--sans);background:#fff;cursor:pointer}
-.form-select:focus{outline:none;border-color:var(--azul2)}
-.modal-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;background:var(--bg)}
-
-/* SYNC BADGE */
-.sync-info{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);padding:6px 12px;background:var(--azulclaro);border-radius:6px;border:1px solid #c5d8f5}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-
-/* CHARTS */
-.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-.chart-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px 18px;box-shadow:var(--shadow)}
-.chart-title{font-size:10px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;display:flex;align-items:center;gap:6px}
-.chart-title::before{content:'';width:12px;height:3px;background:var(--azul);border-radius:2px}
-.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
-.bar-lbl{font-size:11px;color:var(--text2);width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
-.bar-track{flex:1;height:7px;background:#edf0f7;border-radius:4px;overflow:hidden}
-.bar-fill{height:100%;border-radius:4px;transition:width 0.4s ease}
-.bar-val{font-size:10px;color:var(--text3);min-width:30px;text-align:right;font-variant-numeric:tabular-nums}
-
+.ov{position:fixed;inset:0;background:rgba(0,30,80,.45);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(3px)}
+.ov.open{display:flex}
+.modal{background:#fff;border-radius:12px;width:440px;max-width:95vw;box-shadow:0 20px 60px rgba(0,30,80,.25);overflow:hidden}
+.mh{background:var(--azul);padding:16px 20px;display:flex;align-items:center;gap:10px}
+.mht{font-size:14px;font-weight:600;color:#fff;flex:1}
+.mhx{width:28px;height:28px;border-radius:6px;background:rgba(255,255,255,.1);border:none;color:#fff;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+.mhx:hover{background:rgba(255,255,255,.2)}
+.mb{padding:18px 20px}
+.mdesc{font-size:12px;color:var(--text2);background:var(--bg);border-radius:6px;padding:9px 12px;margin-bottom:14px;line-height:1.5;border-left:3px solid var(--azul)}
+.fl{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;letter-spacing:.02em}
+.fi{width:100%;border:1px solid var(--border);border-radius:6px;padding:7px 11px;font-size:13px;color:var(--text);font-family:var(--sans);margin-bottom:12px}
+.fi:focus{outline:none;border-color:var(--azul2);box-shadow:0 0 0 3px rgba(0,86,204,.1)}
+.mf{padding:13px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;background:var(--bg)}
 /* VIEWS */
 .view{display:none}
 .view.active{display:block}
-
 /* TOAST */
-#toast{position:fixed;bottom:24px;right:24px;background:var(--azul);color:#fff;border-radius:8px;padding:11px 18px;font-size:12px;font-weight:500;z-index:2000;transform:translateY(60px);opacity:0;transition:all 0.25s;pointer-events:none;box-shadow:var(--shadow2)}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--azul);color:#fff;border-radius:8px;padding:10px 18px;font-size:12px;font-weight:500;z-index:2000;transform:translateY(60px);opacity:0;transition:all .25s;pointer-events:none;box-shadow:var(--shadow)}
 #toast.show{transform:translateY(0);opacity:1}
 #toast.ok{background:var(--green)}
 #toast.err{background:var(--rojo)}
-
 /* CHAT */
-#chat-panel{width:320px;background:var(--white);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:width 0.2s}
-#chat-panel.hidden{width:0;overflow:hidden;border:none}
-.chat-head{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--azul)}
-.chat-head-title{font-size:13px;font-weight:600;color:#fff;flex:1}
-.chat-model-tag{font-size:9px;color:rgba(255,255,255,0.5);font-family:monospace}
-#chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#fafbfd}
-.cmsg.user .bubble{background:var(--azul);color:#fff;margin-left:30px;border-radius:12px 12px 2px 12px}
-.cmsg.ai .bubble{background:#fff;color:var(--text);border:1px solid var(--border);margin-right:30px;border-radius:12px 12px 12px 2px}
-.bubble{padding:9px 12px;font-size:12px;line-height:1.5}
-.chat-input-area{padding:10px;border-top:1px solid var(--border);display:flex;gap:8px}
-.chat-inp{flex:1;border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text);font-family:var(--sans);resize:none;background:var(--bg)}
-.chat-inp:focus{outline:none;border-color:var(--azul2);background:#fff}
-.chat-send-btn{padding:7px 10px;background:var(--azul);border:none;border-radius:6px;cursor:pointer;color:#fff;display:flex;align-items:center}
-.chat-send-btn:hover{background:var(--azul2)}
-.typing span{width:4px;height:4px;background:var(--text3);border-radius:50%;display:inline-block;animation:blink 1.2s infinite}
-.typing span:nth-child(2){animation-delay:.2s}
-.typing span:nth-child(3){animation-delay:.4s}
+#chat{width:310px;background:var(--white);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:width .2s}
+#chat.hidden{width:0;overflow:hidden;border:none}
+.chd{padding:12px 15px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--azul)}
+.chdt{font-size:13px;font-weight:600;color:#fff;flex:1}
+.chdm{font-size:9px;color:rgba(255,255,255,.4);font-family:monospace}
+#cmsgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#fafbfd}
+.cmsg.user .bbl{background:var(--azul);color:#fff;margin-left:20px;border-radius:10px 10px 2px 10px}
+.cmsg.ai .bbl{background:#fff;color:var(--text);border:1px solid var(--border);margin-right:20px;border-radius:10px 10px 10px 2px}
+.bbl{padding:8px 11px;font-size:12px;line-height:1.5}
+.cia{padding:9px;border-top:1px solid var(--border);display:flex;gap:7px}
+.cinp{flex:1;border:1px solid var(--border);border-radius:6px;padding:6px 9px;font-size:12px;color:var(--text);font-family:var(--sans);resize:none;background:var(--bg)}
+.cinp:focus{outline:none;border-color:var(--azul2);background:#fff}
+.csend{padding:7px 10px;background:var(--azul);border:none;border-radius:6px;cursor:pointer;color:#fff;display:flex;align-items:center}
+.csend:hover{background:var(--azul2)}
+.typ span{width:4px;height:4px;background:var(--text3);border-radius:50%;display:inline-block;animation:blink 1.2s infinite}
+.typ span:nth-child(2){animation-delay:.2s}
+.typ span:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
-
-/* EMPTY */
-.empty{text-align:center;padding:50px 20px}
-.empty svg{width:44px;height:44px;color:var(--text3);margin:0 auto 14px;display:block}
-.empty h3{font-size:14px;font-weight:500;color:var(--text2);margin-bottom:6px}
-.empty p{font-size:12px;color:var(--text3)}
-
-/* SCROLLBAR */
+/* UPLOAD */
+.upzone{border:2px dashed var(--border);border-radius:10px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg)}
+.upzone:hover{border-color:var(--azul);background:var(--azulclaro)}
 ::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:#d0d7e8;border-radius:3px}
 </style>
 </head>
 <body>
 <div id="app">
-
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <div class="logo-wrap">
-    <div class="logo-escudo">🏛️</div>
+<div id="sb">
+  <div class="logo">
+    <div class="logo-icon">🏛️</div>
     <div class="logo-title">GADMR</div>
     <div class="logo-sub">Dirección de Obras Públicas</div>
-    <div class="logo-year">PAC 2026</div>
+    <div class="logo-tag">PAC 2026</div>
   </div>
-  <div class="nav-sect">Módulos</div>
-  <div class="nav-item active" onclick="showView('resumen')" id="nav-resumen">
+  <div class="ns">Módulos</div>
+  <div class="ni on" id="n-resumen" onclick="showView('resumen')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Resumen General
   </div>
-  <div class="nav-item" onclick="showView('pac')" id="nav-pac">
+  <div class="ni" id="n-pac" onclick="showView('pac')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
     Listado PAC
   </div>
-  <div class="nav-item" onclick="showView('alertas')" id="nav-alertas">
+  <div class="ni" id="n-alertas" onclick="showView('alertas')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     Sin vínculo e-DOC
-    <span class="nav-badge" id="badge-alertas" style="display:none">0</span>
+    <span class="nbadge" id="nbadge" style="display:none">0</span>
   </div>
-  <div class="nav-item" onclick="showView('reporte')" id="nav-reporte">
+  <div class="ni" id="n-reporte" onclick="showView('reporte')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
     Reporte
   </div>
-  <div class="nav-sect">Sistema</div>
-  <div class="nav-item" onclick="syncEdoc()">
+  <div class="ni" id="n-cargar" onclick="showView('cargar')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    Cargar PAC
+  </div>
+  <div class="ns">Sistema</div>
+  <div class="ni" onclick="syncEdoc()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
     Sincronizar e-DOC
   </div>
-  <div class="nav-item" onclick="exportExcel()">
+  <div class="ni" onclick="exportExcel()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     Exportar Excel
   </div>
-  <div class="sidebar-bottom">
-    <div class="apikey-label">Claude API Key</div>
-    <input class="apikey-input" type="password" id="api-key" placeholder="sk-ant-..." oninput="localStorage.setItem('pac_apikey',this.value)">
+  <div class="sb-bottom">
+    <div class="aklabel">Claude API Key</div>
+    <input class="akinput" type="password" id="api-key" placeholder="sk-ant-..." oninput="localStorage.setItem('pac_apikey',this.value)">
   </div>
 </div>
 
-<!-- MAIN -->
 <div id="main">
   <div id="topbar">
-    <div class="topbar-line"></div>
-    <div>
-      <div class="topbar-title" id="topbar-title">Resumen General</div>
-    </div>
-    <div class="topbar-meta" id="topbar-meta">
-      <div class="topbar-stat">Total: <strong id="top-total">0</strong></div>
-      <div class="topbar-stat">Presupuesto: <strong id="top-pres">$0</strong></div>
-      <div class="topbar-stat">Con e-DOC: <strong id="top-edoc">0</strong></div>
-    </div>
-    <div id="sync-status" class="sync-info" style="display:none">
-      <span class="sync-dot"></span>
-      <span id="sync-text">Sincronizado</span>
-    </div>
+    <div class="tb-bar"></div>
+    <div class="tb-title" id="tbtitle">Resumen General</div>
+    <div class="tb-stat">Total: <strong id="tbt">0</strong></div>
+    <div class="tb-stat">Presupuesto: <strong id="tbp">$0</strong></div>
+    <div class="tb-stat">Con e-DOC: <strong id="tbe">0</strong></div>
     <button class="btn" onclick="toggleChat()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       Asistente
     </button>
   </div>
-
   <div id="content">
 
     <!-- RESUMEN -->
     <div class="view active" id="view-resumen">
-      <div class="metrics-row">
-        <div class="mcard">
-          <div class="mcard-label">Total Procesos</div>
-          <div class="mcard-val" id="m-total">0</div>
-          <div class="mcard-sub">PAC 2026 — Obras Públicas</div>
-        </div>
-        <div class="mcard" style="--c:var(--azul)">
-          <div class="mcard-label">Presupuesto Total</div>
-          <div class="mcard-val" id="m-pres">$0</div>
-          <div class="mcard-sub">monto referencial</div>
-        </div>
-        <div class="mcard green">
-          <div class="mcard-label">Con vínculo e-DOC</div>
-          <div class="mcard-val" id="m-con">0</div>
-          <div class="mcard-sub">trámites enlazados</div>
-        </div>
-        <div class="mcard red">
-          <div class="mcard-label">Sin vínculo e-DOC</div>
-          <div class="mcard-val" id="m-sin">0</div>
-          <div class="mcard-sub">requieren enlace</div>
-        </div>
-        <div class="mcard yellow">
-          <div class="mcard-label">Última sincronización</div>
-          <div class="mcard-val" id="m-sync" style="font-size:14px;margin-top:4px">—</div>
-          <div class="mcard-sub">e-DOC actualizado</div>
-        </div>
+      <div class="mrow">
+        <div class="mc"><div class="ml">Total Procesos</div><div class="mv" id="m0">0</div><div class="msub">PAC 2026 Obras Públicas</div></div>
+        <div class="mc"><div class="ml">Presupuesto Total</div><div class="mv" id="m1">$0</div><div class="msub">monto referencial</div></div>
+        <div class="mc g"><div class="ml">Con vínculo e-DOC</div><div class="mv" id="m2">0</div><div class="msub">trámites enlazados</div></div>
+        <div class="mc r"><div class="ml">Sin vínculo e-DOC</div><div class="mv" id="m3">0</div><div class="msub">requieren enlace</div></div>
+        <div class="mc y"><div class="ml">Última Sincronización</div><div class="mv" id="m4">—</div><div class="msub">e-DOC actualizado</div></div>
       </div>
-      <div class="charts-row">
-        <div class="chart-card">
-          <div class="chart-title">Distribución por tipo</div>
-          <div id="chart-tipo"></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Distribución por cuatrimestre</div>
-          <div id="chart-cuat"></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Procedimiento sugerido</div>
-          <div id="chart-proc"></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Estado e-DOC (trámites vinculados)</div>
-          <div id="chart-edoc-est"></div>
-        </div>
+      <div class="crow">
+        <div class="cc"><div class="ct">Distribución por tipo</div><div id="ctipo"></div></div>
+        <div class="cc"><div class="ct">Por cuatrimestre</div><div id="ccuat"></div></div>
+        <div class="cc"><div class="ct">Procedimiento sugerido</div><div id="cproc"></div></div>
+        <div class="cc"><div class="ct">Estado e-DOC</div><div id="cedoc"></div></div>
       </div>
     </div>
 
     <!-- PAC -->
     <div class="view" id="view-pac">
       <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Procesos PAC 2026 — Dirección de Obras Públicas</div>
-          <div class="tbl-controls">
-            <input class="search-box" type="text" id="search" placeholder="Buscar proceso..." oninput="filterTable()">
-            <select class="flt" id="flt-tipo" onchange="filterTable()">
-              <option value="">Todos los tipos</option>
-              <option>OBRAS</option><option>BIEN</option><option>SERVICIO</option><option>CONSULTORIA</option>
-            </select>
-            <select class="flt" id="flt-edoc" onchange="filterTable()">
-              <option value="">e-DOC: todos</option>
-              <option value="con">Con vínculo</option>
-              <option value="sin">Sin vínculo</option>
-            </select>
-            <select class="flt" id="flt-hoja" onchange="filterTable()">
-              <option value="">Todas las hojas</option>
-              <option value="PAC2026">PAC2026</option>
-              <option value="INFIMAS">Ínfimas</option>
-            </select>
+        <div class="ph">
+          <div class="ptitle">Procesos PAC 2026 — Dirección de Obras Públicas</div>
+          <div class="tcontrols">
+            <input class="sb" type="text" id="search" placeholder="Buscar..." oninput="ft()">
+            <select class="flt" id="ftipo" onchange="ft()"><option value="">Todos los tipos</option><option>OBRAS</option><option>BIEN</option><option>SERVICIO</option><option>CONSULTORIA</option></select>
+            <select class="flt" id="fedoc" onchange="ft()"><option value="">e-DOC: todos</option><option value="con">Con vínculo</option><option value="sin">Sin vínculo</option></select>
+            <select class="flt" id="fhoja" onchange="ft()"><option value="">Todas</option><option value="PAC2026">PAC2026</option><option value="INFIMAS">Ínfimas</option></select>
           </div>
         </div>
-        <div class="tbl-wrap">
+        <div class="twrap">
           <table>
-            <thead>
-              <tr>
-                <th style="width:36px">#</th>
-                <th style="width:70px" onclick="sortBy('tipo')">Tipo</th>
-                <th onclick="sortBy('descripcion')">Descripción</th>
-                <th style="width:100px" onclick="sortBy('monto')">Monto</th>
-                <th style="width:95px" onclick="sortBy('fase')">Procedimiento</th>
-                <th style="width:90px" onclick="sortBy('fecha_planificada')">Cuatrimestre</th>
-                <th style="width:60px">Hoja</th>
-                <th style="width:170px">Vínculo e-DOC</th>
-                <th style="width:120px">Estado e-DOC</th>
-              </tr>
-            </thead>
-            <tbody id="pac-tbody"></tbody>
+            <thead><tr>
+              <th style="width:34px">#</th>
+              <th style="width:80px" onclick="sb2('tipo')">Tipo</th>
+              <th onclick="sb2('descripcion')">Descripción</th>
+              <th style="width:105px;text-align:right" onclick="sb2('monto')">Monto</th>
+              <th style="width:110px" onclick="sb2('fase')">Procedimiento</th>
+              <th style="width:95px" onclick="sb2('fecha_planificada')">Cuatrimestre</th>
+              <th style="width:55px">Hoja</th>
+              <th style="width:165px">Vínculo e-DOC</th>
+              <th style="width:130px">Estado e-DOC</th>
+            </tr></thead>
+            <tbody id="ptbody"></tbody>
           </table>
         </div>
-        <div class="pagination">
-          <button class="page-btn" id="prev-btn" onclick="changePage(-1)">← Anterior</button>
-          <div class="page-info" id="page-info">—</div>
-          <button class="page-btn" id="next-btn" onclick="changePage(1)">Siguiente →</button>
+        <div class="pag">
+          <button class="pb" id="prev" onclick="cp(-1)">← Anterior</button>
+          <div class="pi" id="pinfo">—</div>
+          <button class="pb" id="next" onclick="cp(1)">Siguiente →</button>
         </div>
       </div>
     </div>
@@ -390,25 +286,51 @@ tbody td.mono{font-family:monospace;font-size:11px}
     <!-- ALERTAS -->
     <div class="view" id="view-alertas">
       <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Procesos sin vínculo e-DOC</div>
-          <div class="panel-sub" id="alertas-count">—</div>
-        </div>
-        <div id="alertas-body"></div>
+        <div class="ph"><div class="ptitle">Procesos sin vínculo e-DOC</div><div id="acnt" style="font-size:11px;color:var(--text3)">—</div></div>
+        <div id="abody"></div>
       </div>
     </div>
 
     <!-- REPORTE -->
     <div class="view" id="view-reporte">
       <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Reporte PAC 2026</div>
-          <button class="btn" onclick="window.print()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            Imprimir
-          </button>
+        <div class="ph">
+          <div class="ptitle">Reporte PAC 2026</div>
+          <button class="btn" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Imprimir</button>
         </div>
-        <div id="reporte-body" style="padding:20px"></div>
+        <div id="rbody" style="padding:20px"></div>
+      </div>
+    </div>
+
+    <!-- CARGAR -->
+    <div class="view" id="view-cargar">
+      <div class="panel" style="max-width:580px">
+        <div class="ph"><div class="ptitle">Cargar PAC de otra dirección</div></div>
+        <div style="padding:18px 20px">
+          <p style="font-size:12px;color:var(--text2);margin-bottom:16px">Importa el Excel del PAC de cualquier dirección. El sistema reconoce automáticamente el formato SERCOP.</p>
+          <label class="fl">Dirección</label>
+          <select class="fi" id="udir" style="cursor:pointer" onchange="document.getElementById('udircustom').style.display=this.value=='__otro'?'block':'none'">
+            <option value="">— Seleccionar —</option>
+            <option>Dirección de Obras Públicas</option>
+            <option>Dirección de Planificación</option>
+            <option>Dirección Financiera</option>
+            <option>Dirección Administrativa</option>
+            <option>Dirección Jurídica</option>
+            <option>Secretaría General</option>
+            <option>Unidad de Compras Públicas</option>
+            <option>Unidad de TIC</option>
+            <option>Gestión Ambiental</option>
+            <option value="__otro">Otra...</option>
+          </select>
+          <input class="fi" type="text" id="udircustom" placeholder="Nombre de la dirección" style="display:none">
+          <div class="upzone" onclick="document.getElementById('fpac').click()" ondragover="this.style.borderColor='var(--azul)';event.preventDefault()" ondragleave="this.style.borderColor='var(--border)'" ondrop="doDrop(event)">
+            <input type="file" id="fpac" accept=".xlsx,.xls,.csv" style="display:none" onchange="doFile(event)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:34px;height:34px;color:var(--text3);margin:0 auto 10px;display:block"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px">Arrastra el Excel del PAC aquí</div>
+            <div style="font-size:11px;color:var(--text3)">o haz clic · .xlsx .xls .csv</div>
+          </div>
+          <div id="dirlist" style="margin-top:18px"></div>
+        </div>
       </div>
     </div>
 
@@ -416,467 +338,361 @@ tbody td.mono{font-family:monospace;font-size:11px}
 </div>
 
 <!-- CHAT -->
-<div id="chat-panel" class="hidden">
-  <div class="chat-head">
-    <div class="chat-head-title">Asistente GADMR</div>
-    <div class="chat-model-tag">claude-haiku-4-5</div>
+<div id="chat" class="hidden">
+  <div class="chd">
+    <div class="chdt">Asistente GADMR</div>
+    <div class="chdm">claude-haiku-4-5</div>
   </div>
-  <div id="chat-msgs">
-    <div class="cmsg ai"><div class="bubble">Hola. Soy el asistente del PAC Monitor. Puedo analizar los procesos de Obras Públicas, identificar los que faltan vincular al e-DOC, comparar montos por tipo, o responder cualquier consulta. ¿En qué te ayudo?</div></div>
+  <div id="cmsgs">
+    <div class="cmsg ai"><div class="bbl">Hola. Soy el asistente del PAC Monitor. Puedo analizar los 59 procesos de Obras Públicas, identificar los que faltan vincular al e-DOC, o responder consultas sobre montos y procedimientos. ¿En qué te ayudo?</div></div>
   </div>
-  <div class="chat-input-area">
-    <textarea class="chat-inp" id="chat-input" placeholder="Consulta sobre el PAC..." rows="1" onkeydown="chatKey(event)"></textarea>
-    <button class="chat-send-btn" onclick="sendChat()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-    </button>
+  <div class="cia">
+    <textarea class="cinp" id="cinput" placeholder="Consulta sobre el PAC..." rows="1" onkeydown="ckey(event)"></textarea>
+    <button class="csend" onclick="csend()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
   </div>
 </div>
 </div>
 
-<!-- MODAL e-DOC -->
-<div class="overlay" id="modal">
+<!-- MODAL -->
+<div class="ov" id="ov">
   <div class="modal">
-    <div class="modal-head">
-      <div class="modal-head-title">Vincular trámite e-DOC</div>
-      <button class="modal-head-close" onclick="closeModal()">×</button>
+    <div class="mh"><div class="mht">Vincular trámite e-DOC</div><button class="mhx" onclick="cm()">×</button></div>
+    <div class="mb">
+      <div class="mdesc" id="mdesc">—</div>
+      <label class="fl">N° Trámite e-DOC</label>
+      <input class="fi" id="mtramite" type="text" placeholder="Ej: 1176741">
+      <label class="fl">Estado del proceso</label>
+      <select class="fi" id="mestado" style="cursor:pointer">
+        <option>Sin iniciar</option><option>En proceso</option><option>Publicado SERCOP</option>
+        <option>En evaluación</option><option>Adjudicado</option><option>Finalizado</option>
+        <option>Desierto</option><option>Suspendido</option>
+      </select>
+      <label class="fl">Fase actual</label>
+      <input class="fi" id="mfase" type="text" placeholder="Ej: Preparación, Precontractual...">
     </div>
-    <div class="modal-body">
-      <div class="modal-desc" id="modal-desc">—</div>
-      <div class="form-row">
-        <label class="form-label">N° Trámite e-DOC</label>
-        <input class="form-input" id="modal-tramite" type="text" placeholder="Ej: 1176741">
-      </div>
-      <div class="form-row">
-        <label class="form-label">Estado del proceso</label>
-        <select class="form-select" id="modal-estado">
-          <option value="Sin iniciar">Sin iniciar</option>
-          <option value="En proceso">En proceso</option>
-          <option value="Publicado SERCOP">Publicado SERCOP</option>
-          <option value="En evaluación">En evaluación</option>
-          <option value="Adjudicado">Adjudicado</option>
-          <option value="Finalizado">Finalizado</option>
-          <option value="Desierto">Desierto</option>
-          <option value="Suspendido">Suspendido</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Fase actual</label>
-        <input class="form-input" id="modal-fase" type="text" placeholder="Ej: Preparación, Precontractual...">
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn" onclick="closeModal()">Cancelar</button>
-      <button class="btn primary" onclick="saveLink()">Guardar vínculo</button>
+    <div class="mf">
+      <button class="btn" onclick="cm()">Cancelar</button>
+      <button class="btn pri" onclick="sl()">Guardar vínculo</button>
     </div>
   </div>
 </div>
-
 <div id="toast"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-// ── DATOS ────────────────────────────────────────────────────────────────────
-const PAC_DATA_INICIAL = [{"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DEL COLECTOR NORORIENTAL (ALCANTARILLADO PLUVIAL) Y PLANTA DE TRATAMIENTO DE AGUAS RESIDUALES , SECTOR NORORIENTAL DEL CANTÓN RIOBAMBA, PROVINCIA DE CHIMBORAZO", "tipo": "OBRAS", "monto": 6900000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.03", "cpc": "542510012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1000}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE INSUMOS AGRÍCOLAS Y JARDINERÍA PARA EL MANTENIMIENTO DE ÁREAS VERDES DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 48081.7, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.15.15", "cpc": "015100911", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1001}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE MANTENIMIENTO PAISAJÍSTICO Y AGRONÓMICO DE PARQUES, PARTERRES Y ÁREAS VERDES DEL CANTÓN RIOBAMBA.", "tipo": "SERVICIO", "monto": 169473.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.04.18", "cpc": "964210113", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1002}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCIÓN DE OBRAS DE MEJORAMIENTO DE INFRAESTRUCTURA  EN VARIOS SECTORES DEL CANTÓN RIOBAMBA", "tipo": "OBRAS", "monto": 457392.88, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "541220013", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1003}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE MANTENIMIENTO VÍAL PARA DIFERENTES CALLES URBANAS Y RURALES DEL CANTÓN RIOBAMBA", "tipo": "OBRAS", "monto": 288274.57, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "545600014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1004}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE TUBERÍA PARA OBRAS DE INFRAESTRUCTURA EN DIFERENTES SECTORES DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 200000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "363201021", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1005}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISIÓN DE TAPAS Y REJILLAS DE ALCANTARILLADO PARA LA CIUDAD DE RIOBAMBA", "tipo": "BIEN", "monto": 70000.0, "estado": "Sin iniciar", "fase": "CATALOGO ELECTRONICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "363201031", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1006}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE  ALQUILER DE MAQUINARIA PESADA Y EQUIPO CAMINERO PARA EJECUCIÓN DE OBRAS Y MANTENIMIENTO VIAL EN DIFERENTES SECTORES DEL CANTÓN RIOBAMBA", "tipo": "SERVICIO", "monto": 53085.32, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.05.04", "cpc": "548000014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1007}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE EQUIPOS, HERRAMIENTAS Y ACCESORIOS PARA EL FORTALECIMIENTO OPERATIVO DE LA DIRECCIÓN DE GESTIÓN DE OBRAS PÚBLICAS Y PARROQUIAS RURALES", "tipo": "BIEN", "monto": 65000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "", "cpc": "", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1008}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ESTUDIOS ESPECIALIZADOS PARA LA CONSTRUCCIÓN DE LA CASA DEL ADOLESCENTE", "tipo": "CONSULTORIA", "monto": 90742.96, "estado": "Sin iniciar", "fase": "CONCURSO PUBLICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.06.01", "cpc": "839900011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1009}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DE BATERIA SANITARIA EN YARUQUIES E ILUMINACIÓN EN LOS PARQUES DE (YARUQUIES Y LA MADRE) DEL CANTÓN RIOBAMBA", "tipo": "OBRAS", "monto": 72000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.04", "cpc": "542700214", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1010}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCIÓN DE LA CONSTRUCCIÓN DE ESPACIOS URBANOS CÍVICO–CULTURALES EN EL CANTÓN RIOBAMBA", "tipo": "OBRAS", "monto": 135000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.04", "cpc": "542700214", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1011}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DEL BOULEVARD DE LAS ANIMAS ETAPA I", "tipo": "OBRAS", "monto": 260000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.07", "cpc": "541210014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1012}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DE BÓVEDAS EN EL CEMENTERIO GENERAL DE RIOBAMBA FASE II", "tipo": "OBRAS", "monto": 150000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.07", "cpc": "532900011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1013}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "REHABILITACIÓN URBANA DE  LA CALLE VELOZ ENTRE LAS CALLES 5 DE JUNIO Y PEDRO DE ALVARADO", "tipo": "OBRAS", "monto": 619802.4, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre I", "partida": "75.01.05", "cpc": "542100018", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1014}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "REHABILITACIÓN  LA CALLE 10 DE AGOSTO Y LAS CALLES ADYACENTES DEL CENTRO HISTÓRICO DE LA CIUDAD DE RIOBAMBA, ETAPA I", "tipo": "OBRAS", "monto": 1112319.96, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre I", "partida": "75.01.05", "cpc": "542100018", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1015}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "AMPLIACIÓN DEL PUENTE DE INGRESO A LOS BARRIOS LA VICTORIA Y SAN JOSE DE CHIBUNGA", "tipo": "OBRAS", "monto": 150000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100018", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1016}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE EQUIPO CAMINERO PARA EL FORTALECIMIENTO OPERATIVO DE LA DIRECCIÓN DE OBRAS PÚBLICAS DEL GADM RIOBAMBA", "tipo": "BIEN", "monto": 928300.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.05", "cpc": "492100011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1017}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE MANTENIMIENTO DE VIGENCIA TECNOLOGICA VOLQUETAS", "tipo": "SERVICIO", "monto": 33000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.04.05", "cpc": "547900411", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1018}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "FISCALIZACIÓN E INSPECCIONES TÉCNICAS PROYECTOS", "tipo": "CONSULTORIA", "monto": 238740.0, "estado": "Sin iniciar", "fase": "CONCURSO PUBLICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.06.04", "cpc": "839900111", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1019}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE DIFUSION, INFORMACION Y PUBLICIDAD, OBRA PUBLICA", "tipo": "SERVICIO", "monto": 26295.54, "estado": "Sin iniciar", "fase": "COMUNICACION SOCIAL CONTRATACION DIRECTA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.02.07", "cpc": "836200014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1020}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EDICION IMPRESIÓN, REPRODUCCION, PUBLICACIONES OBRA PUBLICA", "tipo": "SERVICIO", "monto": 11000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.02.04", "cpc": "891211011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1021}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EXPROPIACIÓN DE VARIOS PREDIOS", "tipo": "BIEN", "monto": 635719.86, "estado": "Sin iniciar", "fase": "ADQUISICION DE BIENES INMUEBLES", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.03.01", "cpc": "722300012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1022}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DEL CERRAMIENTO EN EL PREDIO LA MATILDE Y\nADECENTAMIENTO DE SUS ESPACIOS EXTERIORES", "tipo": "OBRAS", "monto": 240000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.07", "cpc": "541210014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1023}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "READECUACIÓN DE LA INFRAESTRUCTURA FÍSICA DEL CENTRO DE PRIVACIÓN DE LIBERTAD DE CHIMBORAZO Nro. 1", "tipo": "OBRAS", "monto": 67000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "541210014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1024}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ESTUDIO DE SUELOS SPT PARA DIFERENTES PROYECTOS DE INFRAESTRUCTURA DE LA CIUDAD DE RIOBAMBA", "tipo": "CONSULTORIA", "monto": 30000.0, "estado": "Sin iniciar", "fase": "CONCURSO PUBLICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.06.01", "cpc": "835100012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1025}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN, INSTALACIÓN Y PUESTA EN MARCHA DE GENERADORES ELÉCTRICOS PARA EL GOBIERNO AUTÓNOMO DESCENTRALIZADO MUNICIPAL DEL CANTÓN RIOBAMBA.", "tipo": "BIEN", "monto": 111700.44, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "461130015", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1026}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISIÓN DE MATERIALES PETREOS ENTREGADOS EN MINA PARA VARIAS OBRAS DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 110000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "153200015", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1027}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE MATERIALES PÉTREOS, ENTREGADOS EN MINA, PARA EL MANTENIMIENTO VIAL EN DIFERENTES SECTORES RURALES DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 428044.28, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "153200015", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1028}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE ADOQUINES PARA EL MEJORAMIENTO DE VÍAS EN DIFERENTES SECTORES URBANOS Y RURALES DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 1564577.59, "estado": "Sin iniciar", "fase": "CATALOGO ELECTRONICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "373700019", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1029}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE CEMENTO PARA EL MEJORAMIENTO VIAL EN DIFERENTES SECTORES URBANOS Y RURALES DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 445792.33, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "374400011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1030}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE MAQUINARIA PARA EL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 1214876.31, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "444210111", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1031}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE MANTENIMIENTO DE EQUIPO CAMINERO DE CANTÓN RIOBAMBA", "tipo": "SERVICIO", "monto": 50000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.04.05", "cpc": "547900411", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1032}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE MATERIALES (TUBERIA) PARA LA CONSTRUCCIÓN DEL SISTEMA DE AGUA POTABLE Y ALCANTARILLADO  DE LA CABECERA PARROQUIAL SAN JUAN FASE", "tipo": "BIEN", "monto": 619819.4, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre I", "partida": "73.08.11", "cpc": "532410011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1033}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EXPROPIACIÓN DEL PREDIO DE LA CABECERA PARROQUIAL DE SAN JUAN", "tipo": "BIEN", "monto": 70000.0, "estado": "Sin iniciar", "fase": "ADQUISICION DE BIENES INMUEBLES", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.03.01", "cpc": "722300012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1034}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ESTUDIOS PARA LA CONSTRUCCION DEL SISTEMA DE AGUA POTABLE Y ALCANTARILLADO DE LA COMUNIDAD BAYUBUG DE LA PARROQUIA CALPI", "tipo": "CONSULTORIA", "monto": 55000.0, "estado": "Sin iniciar", "fase": "CONCURSO PUBLICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.06.01", "cpc": "839900011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1035}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCCIÓN DE ADOQUINADO DE VÍAS EN LA CABECERA PARROQUIAL DE PUNGALÁ", "tipo": "OBRAS", "monto": 140000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1036}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCCIÓN DEL ADOQUINADO DE PURUHUAYPAMBA DE LA PARROQUIA PUNGALA", "tipo": "OBRAS", "monto": 66000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1037}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCCIÓN DE ADOQUINADO DE VARIAS VÍAS DE LA CABECERA PARROQUIAL DE LICTO", "tipo": "OBRAS", "monto": 77719.1, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1038}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "READECUACIÓN DEL CEMENTERIO DE LA CABECERA PARROQUIAL DE LICAN", "tipo": "OBRAS", "monto": 31000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "541210014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1039}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "MANTENIMIENTO Y REHBALITACIÓN VIAL DE LAS COMUNIDADES DE LA PARROQUIA CUBIJÍES", "tipo": "OBRAS", "monto": 209954.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100018", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1040}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "READECUACIÓN DEL COLISEO DE LA PARROQUIA CUBIJIES", "tipo": "OBRAS", "monto": 120000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "541210014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1041}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EXPROPIACIÓN DEL TERRENO PARA AMPLIACIÓN DEL CEMENTERIO DE LA PARROQUIA QUIMIAG", "tipo": "BIEN", "monto": 100000.0, "estado": "Sin iniciar", "fase": "ADQUISICION DE BIENES INMUEBLES", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.03.01", "cpc": "722300012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1042}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCIÓN DE LA CONSTRUCCIÓN DE LA CUBIERTA METÁLICA DE LA CANCHA DE LA COMUNIDAD SHILPALA, PARROQUIA CACHA", "tipo": "OBRAS", "monto": 80000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.04", "cpc": "544000114", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1043}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCCIÓN  DE CENTRO TURISTICO DE SAN MIGUEL DE QUERA FASE I PARROQUIA CACHA", "tipo": "OBRAS", "monto": 79901.46, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.07", "cpc": "541210012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1044}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ASFALTADO DE VÍAS PARA LAS COMUNIDADES CACHA, PUCARAQUINCHE - CACHA HUAGSHI", "tipo": "OBRAS", "monto": 631706.67, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100018", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1045}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCIÓN DE LA CONSTRUCCIÓN DE CUBIERTAS PARA LA CANCHA DE USO MÚLTIPLE DE LA COMUNIDAD SAN VICENTE Y EL GRADERÍO DE LA COMUNIDAD CACHIGUAYCO, PARROQUIA PUNÍN", "tipo": "OBRAS", "monto": 102999.7, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.04", "cpc": "544000114", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1046}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DE BATERIAS SANITARIAS Y VESTIDORES DE LA COMUNIDAD DE SAN JUAN DE PALLO , PARROQUIA PUNIN", "tipo": "OBRAS", "monto": 72000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.04", "cpc": "541210012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1047}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "MEJORAMIENTO DES ESPACIOS RECREATIVOS DE COMUNIDADES DE LA PARROQUIA PUNÍN", "tipo": "OBRAS", "monto": 28823.7, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "542700215", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1048}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICION DE MATERIALES PARA LA TERMINACION DEL CENTRO DE CONVENCIONES DE LA COMUNIDAD MIRALOMA, PARROQUIA PUNIN.", "tipo": "BIEN", "monto": 41000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "624650012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1049}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DE BORDILLOS EN LA COMUNIDAD SAN ISIDRO DE PUNÍN", "tipo": "OBRAS", "monto": 62302.56, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "532900011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1050}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "MANTENIMIENTO Y REHABILITACION DE LA IGLESIA PATRIMONIAL DEL SANTO CRISTO DE LA PARROQUIA FLORES", "tipo": "OBRAS", "monto": 80000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre III", "partida": "75.05.01", "cpc": "541210031", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1051}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE CAMARAS DE SEGURIDAD Y VIGILANCIA PARA LA PARROQUIA FLORES", "tipo": "BIEN", "monto": 20000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "732900012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1052}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE UN TRACTOR CORTA CÉSPED Y DE UNA MOTOGUADAÑA PARA LA PARROQUIA PUNÍN", "tipo": "BIEN", "monto": 10000.0, "estado": "Sin iniciar", "fase": "INFÍMA CUANTÍA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "441200011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1053}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE BOMBA DE AGUA PARA LA COMUNIDAD AMBUG, PARROQUIA PUNÍN", "tipo": "BIEN", "monto": 15000.0, "estado": "Sin iniciar", "fase": "INFÍMA CUANTÍA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "432200112", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1054}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCIÓN DE LA CONSTRUCCIÓN DEL SISTEMA DE DRENAJE DEL ESTADIO DE LA CABECERA PARROQUIALDE FLORES", "tipo": "OBRAS", "monto": 10000.0, "estado": "Sin iniciar", "fase": "INFÍMA CUANTÍA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "542700214", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1055}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE MANTENIMIENTO DEL EDIFICIO Y COLISEO DEL GAD PARROQUIAL FLORES", "tipo": "SERVICIO", "monto": 10000.0, "estado": "Sin iniciar", "fase": "INFÍMA CUANTÍA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.04.17", "cpc": "541210015", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1056}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE CONCRETERA, FORMALETAS Y ENCOFRADOS PARA EL FORTALECIMIENTO DE LOS TRABAJOS DE CONSTRUCCIÓN Y MEJORAMIENTO DE INFRAESTRUCTURA EN LA PARROQUIA FLORES", "tipo": "BIEN", "monto": 10000.0, "estado": "Sin iniciar", "fase": "INFÍMA CUANTÍA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "4219000110", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1057}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "LETRAS CORPÓREAS PARA LA PARROQUIA PUNIN", "tipo": "BIEN", "monto": 11000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre I", "partida": "73.02.04", "cpc": "836100021", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1058}];
+// ── DATOS INCRUSTADOS ────────────────────────────────────────────────────────
+const D0 = [{"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DEL COLECTOR NORORIENTAL (ALCANTARILLADO PLUVIAL) Y PLANTA DE TRATAMIENTO DE AGUAS RESIDUALES , SECTOR NORORIENTAL DEL CANTÓN RIOBAMBA, PROVINCIA DE CHIMBORAZO", "tipo": "OBRAS", "monto": 6900000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.03", "cpc": "542510012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1000}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE INSUMOS AGRÍCOLAS Y JARDINERÍA PARA EL MANTENIMIENTO DE ÁREAS VERDES DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 48081.7, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.15.15", "cpc": "015100911", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1001}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE MANTENIMIENTO PAISAJÍSTICO Y AGRONÓMICO DE PARQUES, PARTERRES Y ÁREAS VERDES DEL CANTÓN RIOBAMBA.", "tipo": "SERVICIO", "monto": 169473.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.04.18", "cpc": "964210113", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1002}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCIÓN DE OBRAS DE MEJORAMIENTO DE INFRAESTRUCTURA  EN VARIOS SECTORES DEL CANTÓN RIOBAMBA", "tipo": "OBRAS", "monto": 457392.88, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "541220013", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1003}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE MANTENIMIENTO VÍAL PARA DIFERENTES CALLES URBANAS Y RURALES DEL CANTÓN RIOBAMBA", "tipo": "OBRAS", "monto": 288274.57, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "545600014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1004}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE TUBERÍA PARA OBRAS DE INFRAESTRUCTURA EN DIFERENTES SECTORES DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 200000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "363201021", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1005}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISIÓN DE TAPAS Y REJILLAS DE ALCANTARILLADO PARA LA CIUDAD DE RIOBAMBA", "tipo": "BIEN", "monto": 70000.0, "estado": "Sin iniciar", "fase": "CATALOGO ELECTRONICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "363201031", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1006}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE  ALQUILER DE MAQUINARIA PESADA Y EQUIPO CAMINERO PARA EJECUCIÓN DE OBRAS Y MANTENIMIENTO VIAL EN DIFERENTES SECTORES DEL CANTÓN RIOBAMBA", "tipo": "SERVICIO", "monto": 53085.32, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.05.04", "cpc": "548000014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1007}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE EQUIPOS, HERRAMIENTAS Y ACCESORIOS PARA EL FORTALECIMIENTO OPERATIVO DE LA DIRECCIÓN DE GESTIÓN DE OBRAS PÚBLICAS Y PARROQUIAS RURALES", "tipo": "BIEN", "monto": 65000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "", "cpc": "", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1008}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ESTUDIOS ESPECIALIZADOS PARA LA CONSTRUCCIÓN DE LA CASA DEL ADOLESCENTE", "tipo": "CONSULTORIA", "monto": 90742.96, "estado": "Sin iniciar", "fase": "CONCURSO PUBLICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.06.01", "cpc": "839900011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1009}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DE BATERIA SANITARIA EN YARUQUIES E ILUMINACIÓN EN LOS PARQUES DE (YARUQUIES Y LA MADRE) DEL CANTÓN RIOBAMBA", "tipo": "OBRAS", "monto": 72000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.04", "cpc": "542700214", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1010}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCIÓN DE LA CONSTRUCCIÓN DE ESPACIOS URBANOS CÍVICO–CULTURALES EN EL CANTÓN RIOBAMBA", "tipo": "OBRAS", "monto": 135000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.04", "cpc": "542700214", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1011}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DEL BOULEVARD DE LAS ANIMAS ETAPA I", "tipo": "OBRAS", "monto": 260000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.07", "cpc": "541210014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1012}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DE BÓVEDAS EN EL CEMENTERIO GENERAL DE RIOBAMBA FASE II", "tipo": "OBRAS", "monto": 150000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.07", "cpc": "532900011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1013}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "REHABILITACIÓN URBANA DE  LA CALLE VELOZ ENTRE LAS CALLES 5 DE JUNIO Y PEDRO DE ALVARADO", "tipo": "OBRAS", "monto": 619802.4, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre I", "partida": "75.01.05", "cpc": "542100018", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1014}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "REHABILITACIÓN  LA CALLE 10 DE AGOSTO Y LAS CALLES ADYACENTES DEL CENTRO HISTÓRICO DE LA CIUDAD DE RIOBAMBA, ETAPA I", "tipo": "OBRAS", "monto": 1112319.96, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre I", "partida": "75.01.05", "cpc": "542100018", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1015}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "AMPLIACIÓN DEL PUENTE DE INGRESO A LOS BARRIOS LA VICTORIA Y SAN JOSE DE CHIBUNGA", "tipo": "OBRAS", "monto": 150000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100018", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1016}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE EQUIPO CAMINERO PARA EL FORTALECIMIENTO OPERATIVO DE LA DIRECCIÓN DE OBRAS PÚBLICAS DEL GADM RIOBAMBA", "tipo": "BIEN", "monto": 928300.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.05", "cpc": "492100011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1017}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE MANTENIMIENTO DE VIGENCIA TECNOLOGICA VOLQUETAS", "tipo": "SERVICIO", "monto": 33000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.04.05", "cpc": "547900411", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1018}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "FISCALIZACIÓN E INSPECCIONES TÉCNICAS PROYECTOS", "tipo": "CONSULTORIA", "monto": 238740.0, "estado": "Sin iniciar", "fase": "CONCURSO PUBLICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.06.04", "cpc": "839900111", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1019}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE DIFUSION, INFORMACION Y PUBLICIDAD, OBRA PUBLICA", "tipo": "SERVICIO", "monto": 26295.54, "estado": "Sin iniciar", "fase": "COMUNICACION SOCIAL CONTRATACION DIRECTA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.02.07", "cpc": "836200014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1020}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EDICION IMPRESIÓN, REPRODUCCION, PUBLICACIONES OBRA PUBLICA", "tipo": "SERVICIO", "monto": 11000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.02.04", "cpc": "891211011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1021}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EXPROPIACIÓN DE VARIOS PREDIOS", "tipo": "BIEN", "monto": 635719.86, "estado": "Sin iniciar", "fase": "ADQUISICION DE BIENES INMUEBLES", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.03.01", "cpc": "722300012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1022}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DEL CERRAMIENTO EN EL PREDIO LA MATILDE Y\nADECENTAMIENTO DE SUS ESPACIOS EXTERIORES", "tipo": "OBRAS", "monto": 240000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.07", "cpc": "541210014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1023}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "READECUACIÓN DE LA INFRAESTRUCTURA FÍSICA DEL CENTRO DE PRIVACIÓN DE LIBERTAD DE CHIMBORAZO Nro. 1", "tipo": "OBRAS", "monto": 67000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "541210014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1024}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ESTUDIO DE SUELOS SPT PARA DIFERENTES PROYECTOS DE INFRAESTRUCTURA DE LA CIUDAD DE RIOBAMBA", "tipo": "CONSULTORIA", "monto": 30000.0, "estado": "Sin iniciar", "fase": "CONCURSO PUBLICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.06.01", "cpc": "835100012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1025}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN, INSTALACIÓN Y PUESTA EN MARCHA DE GENERADORES ELÉCTRICOS PARA EL GOBIERNO AUTÓNOMO DESCENTRALIZADO MUNICIPAL DEL CANTÓN RIOBAMBA.", "tipo": "BIEN", "monto": 111700.44, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "461130015", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1026}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISIÓN DE MATERIALES PETREOS ENTREGADOS EN MINA PARA VARIAS OBRAS DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 110000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "153200015", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1027}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE MATERIALES PÉTREOS, ENTREGADOS EN MINA, PARA EL MANTENIMIENTO VIAL EN DIFERENTES SECTORES RURALES DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 428044.28, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "153200015", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1028}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE ADOQUINES PARA EL MEJORAMIENTO DE VÍAS EN DIFERENTES SECTORES URBANOS Y RURALES DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 1564577.59, "estado": "Sin iniciar", "fase": "CATALOGO ELECTRONICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "373700019", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1029}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE CEMENTO PARA EL MEJORAMIENTO VIAL EN DIFERENTES SECTORES URBANOS Y RURALES DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 445792.33, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "374400011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1030}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE MAQUINARIA PARA EL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 1214876.31, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "444210111", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1031}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE MANTENIMIENTO DE EQUIPO CAMINERO DE CANTÓN RIOBAMBA", "tipo": "SERVICIO", "monto": 50000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.04.05", "cpc": "547900411", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1032}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE MATERIALES (TUBERIA) PARA LA CONSTRUCCIÓN DEL SISTEMA DE AGUA POTABLE Y ALCANTARILLADO  DE LA CABECERA PARROQUIAL SAN JUAN FASE", "tipo": "BIEN", "monto": 619819.4, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre I", "partida": "73.08.11", "cpc": "532410011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1033}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EXPROPIACIÓN DEL PREDIO DE LA CABECERA PARROQUIAL DE SAN JUAN", "tipo": "BIEN", "monto": 70000.0, "estado": "Sin iniciar", "fase": "ADQUISICION DE BIENES INMUEBLES", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.03.01", "cpc": "722300012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1034}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ESTUDIOS PARA LA CONSTRUCCION DEL SISTEMA DE AGUA POTABLE Y ALCANTARILLADO DE LA COMUNIDAD BAYUBUG DE LA PARROQUIA CALPI", "tipo": "CONSULTORIA", "monto": 55000.0, "estado": "Sin iniciar", "fase": "CONCURSO PUBLICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.06.01", "cpc": "839900011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1035}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCCIÓN DE ADOQUINADO DE VÍAS EN LA CABECERA PARROQUIAL DE PUNGALÁ", "tipo": "OBRAS", "monto": 140000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1036}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCCIÓN DEL ADOQUINADO DE PURUHUAYPAMBA DE LA PARROQUIA PUNGALA", "tipo": "OBRAS", "monto": 66000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1037}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCCIÓN DE ADOQUINADO DE VARIAS VÍAS DE LA CABECERA PARROQUIAL DE LICTO", "tipo": "OBRAS", "monto": 77719.1, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1038}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "READECUACIÓN DEL CEMENTERIO DE LA CABECERA PARROQUIAL DE LICAN", "tipo": "OBRAS", "monto": 31000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "541210014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1039}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "MANTENIMIENTO Y REHBALITACIÓN VIAL DE LAS COMUNIDADES DE LA PARROQUIA CUBIJÍES", "tipo": "OBRAS", "monto": 209954.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100018", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1040}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "READECUACIÓN DEL COLISEO DE LA PARROQUIA CUBIJIES", "tipo": "OBRAS", "monto": 120000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "541210014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1041}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EXPROPIACIÓN DEL TERRENO PARA AMPLIACIÓN DEL CEMENTERIO DE LA PARROQUIA QUIMIAG", "tipo": "BIEN", "monto": 100000.0, "estado": "Sin iniciar", "fase": "ADQUISICION DE BIENES INMUEBLES", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.03.01", "cpc": "722300012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1042}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCIÓN DE LA CONSTRUCCIÓN DE LA CUBIERTA METÁLICA DE LA CANCHA DE LA COMUNIDAD SHILPALA, PARROQUIA CACHA", "tipo": "OBRAS", "monto": 80000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.04", "cpc": "544000114", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1043}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCCIÓN  DE CENTRO TURISTICO DE SAN MIGUEL DE QUERA FASE I PARROQUIA CACHA", "tipo": "OBRAS", "monto": 79901.46, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.07", "cpc": "541210012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1044}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ASFALTADO DE VÍAS PARA LAS COMUNIDADES CACHA, PUCARAQUINCHE - CACHA HUAGSHI", "tipo": "OBRAS", "monto": 631706.67, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100018", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1045}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCIÓN DE LA CONSTRUCCIÓN DE CUBIERTAS PARA LA CANCHA DE USO MÚLTIPLE DE LA COMUNIDAD SAN VICENTE Y EL GRADERÍO DE LA COMUNIDAD CACHIGUAYCO, PARROQUIA PUNÍN", "tipo": "OBRAS", "monto": 102999.7, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.04", "cpc": "544000114", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1046}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DE BATERIAS SANITARIAS Y VESTIDORES DE LA COMUNIDAD DE SAN JUAN DE PALLO , PARROQUIA PUNIN", "tipo": "OBRAS", "monto": 72000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.04", "cpc": "541210012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1047}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "MEJORAMIENTO DES ESPACIOS RECREATIVOS DE COMUNIDADES DE LA PARROQUIA PUNÍN", "tipo": "OBRAS", "monto": 28823.7, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "542700215", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1048}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICION DE MATERIALES PARA LA TERMINACION DEL CENTRO DE CONVENCIONES DE LA COMUNIDAD MIRALOMA, PARROQUIA PUNIN.", "tipo": "BIEN", "monto": 41000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "624650012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1049}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DE BORDILLOS EN LA COMUNIDAD SAN ISIDRO DE PUNÍN", "tipo": "OBRAS", "monto": 62302.56, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "532900011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1050}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "MANTENIMIENTO Y REHABILITACION DE LA IGLESIA PATRIMONIAL DEL SANTO CRISTO DE LA PARROQUIA FLORES", "tipo": "OBRAS", "monto": 80000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre III", "partida": "75.05.01", "cpc": "541210031", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1051}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE CAMARAS DE SEGURIDAD Y VIGILANCIA PARA LA PARROQUIA FLORES", "tipo": "BIEN", "monto": 20000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "732900012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1052}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE UN TRACTOR CORTA CÉSPED Y DE UNA MOTOGUADAÑA PARA LA PARROQUIA PUNÍN", "tipo": "BIEN", "monto": 10000.0, "estado": "Sin iniciar", "fase": "INFÍMA CUANTÍA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "441200011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1053}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE BOMBA DE AGUA PARA LA COMUNIDAD AMBUG, PARROQUIA PUNÍN", "tipo": "BIEN", "monto": 15000.0, "estado": "Sin iniciar", "fase": "INFÍMA CUANTÍA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "432200112", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1054}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCIÓN DE LA CONSTRUCCIÓN DEL SISTEMA DE DRENAJE DEL ESTADIO DE LA CABECERA PARROQUIALDE FLORES", "tipo": "OBRAS", "monto": 10000.0, "estado": "Sin iniciar", "fase": "INFÍMA CUANTÍA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "542700214", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1055}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE MANTENIMIENTO DEL EDIFICIO Y COLISEO DEL GAD PARROQUIAL FLORES", "tipo": "SERVICIO", "monto": 10000.0, "estado": "Sin iniciar", "fase": "INFÍMA CUANTÍA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.04.17", "cpc": "541210015", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1056}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE CONCRETERA, FORMALETAS Y ENCOFRADOS PARA EL FORTALECIMIENTO DE LOS TRABAJOS DE CONSTRUCCIÓN Y MEJORAMIENTO DE INFRAESTRUCTURA EN LA PARROQUIA FLORES", "tipo": "BIEN", "monto": 10000.0, "estado": "Sin iniciar", "fase": "INFÍMA CUANTÍA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "4219000110", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1057}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "LETRAS CORPÓREAS PARA LA PARROQUIA PUNIN", "tipo": "BIEN", "monto": 11000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre I", "partida": "73.02.04", "cpc": "836100021", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1058}];
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let allData = [];
-let filtered = [];
-let sortF = '', sortD = 1;
-let page = 1;
-const PER_PAGE = 20;
-let editId = null;
-let chatOpen = false;
-
-const EDOC_URL = 'https://fborjaf07.github.io/monitoreo-tramites-gadmr/tramites_todos.json';
-const EDOC_BASE = 'http://egobedoc.gadmriobamba.gob.ec:8081/issues/';
+// ── ESTADO ───────────────────────────────────────────────────────────────────
+let A = [], F = [], sF = '', sD = 1, pg = 1, eid = null, chatOpen = false;
+const PP = 20;
+const EBASE = 'http://egobedoc.gadmriobamba.gob.ec:8081/issues/';
+const EURL  = 'https://fborjaf07.github.io/monitoreo-tramites-gadmr/tramites_todos.json';
+const TBADGE = {OBRAS:'bObras',BIEN:'bBien',SERVICIO:'bServicio',CONSULTORIA:'bConsultoria','INFIMA CUANTIA':'bInfima'};
+const CBADGE = {'Cuatrimestre I':'bC1','Cuatrimestre II':'bC2','Cuatrimestre III':'bC3'};
+const EDOT   = {Nuevo:'dok','En proceso':'dok',Adjudicado:'dok',Finalizado:'dgray',Desierto:'derr'};
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', function() {
   const k = localStorage.getItem('pac_apikey');
   if (k) document.getElementById('api-key').value = k;
-  const stored = localStorage.getItem('pac_gadmr_v2');
-  allData = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(PAC_DATA_INICIAL));
-  save();
-  refreshAll();
-  scheduleSync();
+  // Recuperar solo los vínculos e-DOC guardados por el usuario
+  const saved = localStorage.getItem('pac_links');
+  let links = {};
+  if (saved) { try { links = JSON.parse(saved); } catch(e){} }
+  // Siempre partir de datos frescos incrustados
+  A = JSON.parse(JSON.stringify(D0));
+  // Aplicar vínculos guardados
+  A.forEach(r => { if (links[r._id]) Object.assign(r, links[r._id]); });
+  F = [...A];
+  refresh();
+  sched();
 });
 
-function save() { localStorage.setItem('pac_gadmr_v2', JSON.stringify(allData)); }
-
-// ── SCHEDULE SYNC ─────────────────────────────────────────────────────────────
-function scheduleSync() {
-  const now = new Date();
-  const h = now.getHours();
-  // Horario: 6, 10, 14, 18
-  const slots = [6, 10, 14, 18];
-  // Próxima ranura
-  let next = slots.find(s => s > h);
-  if (!next) next = slots[0] + 24;
-  const ms = ((next - h - 1) * 3600 + (60 - now.getMinutes()) * 60 - now.getSeconds()) * 1000;
-  setTimeout(() => { syncEdoc(); scheduleSync(); }, ms);
-  // Si ya toca (dentro de 5 min de una ranura) sincronizar ahora
-  if (slots.some(s => Math.abs(s - h) < 0.1 && now.getMinutes() < 5)) {
-    syncEdoc();
-  }
+function saveLinks() {
+  const links = {};
+  A.forEach(r => {
+    if (r.tramite_edoc || r.estado_edoc) {
+      links[r._id] = { tramite_edoc: r.tramite_edoc, estado: r.estado, fase: r.fase,
+        estado_edoc: r.estado_edoc, horas_edoc: r.horas_edoc, ultimo_mov: r.ultimo_mov };
+    }
+  });
+  localStorage.setItem('pac_links', JSON.stringify(links));
 }
 
-// ── SYNC e-DOC ────────────────────────────────────────────────────────────────
-async function syncEdoc() {
-  const linked = allData.filter(r => r.tramite_edoc);
-  if (!linked.length) return;
-  document.getElementById('sync-status').style.display = 'flex';
-  document.getElementById('sync-text').textContent = 'Sincronizando...';
-  try {
-    const res = await fetch(EDOC_URL + '?_=' + Date.now());
-    const json = await res.json();
-    const tramites = json.tramites || [];
-    let updated = 0;
-    allData.forEach(r => {
-      if (!r.tramite_edoc) return;
-      const t = tramites.find(t => String(t.numero) === String(r.tramite_edoc));
-      if (t) {
-        r.estado_edoc = t.estado_edoc || r.estado_edoc;
-        r.horas_edoc = t.horas_sin_movimiento || 0;
-        r.ultimo_mov = t.ultimo_movimiento ? (t.ultimo_movimiento.fecha || '') : '';
-        r.nota_edoc = t.ultimo_movimiento ? (t.ultimo_movimiento.nota || '') : '';
-        updated++;
-      }
-    });
-    save();
-    const now = new Date();
-    const ts = now.toLocaleTimeString('es-EC', { hour: '2-digit', minute: '2-digit' });
-    document.getElementById('m-sync').textContent = ts;
-    document.getElementById('sync-text').textContent = `Actualizado ${ts}`;
-    if (updated) { refreshAll(); showToast(`${updated} trámites actualizados desde e-DOC`, 'ok'); }
-  } catch(e) {
-    document.getElementById('sync-text').textContent = 'Error de conexión';
-  }
-}
-
-// ── VIEWS ─────────────────────────────────────────────────────────────────────
-function showView(name) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('view-' + name).classList.add('active');
-  document.getElementById('nav-' + name).classList.add('active');
-  const titles = { resumen: 'Resumen General', pac: 'Listado PAC 2026', alertas: 'Sin vínculo e-DOC', reporte: 'Reporte' };
-  document.getElementById('topbar-title').textContent = titles[name] || name;
-  if (name === 'pac') { filtered = [...allData]; renderTable(); }
-  if (name === 'alertas') renderAlertas();
-  if (name === 'reporte') renderReporte();
+// ── VISTAS ────────────────────────────────────────────────────────────────────
+function showView(v) {
+  document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(x => x.classList.remove('on'));
+  document.getElementById('view-'+v).classList.add('active');
+  const ni = document.getElementById('n-'+v);
+  if (ni) ni.classList.add('on');
+  const T = {resumen:'Resumen General',pac:'Listado PAC 2026',alertas:'Sin vínculo e-DOC',reporte:'Reporte PAC 2026',cargar:'Cargar PAC'};
+  document.getElementById('tbtitle').textContent = T[v]||v;
+  if (v==='pac') { F=[...A]; ft(); }
+  if (v==='alertas') rAlertas();
+  if (v==='reporte') rReporte();
+  if (v==='cargar') rDirList();
 }
 
 // ── REFRESH ───────────────────────────────────────────────────────────────────
-function refreshAll() {
-  const total = allData.length;
-  const pres = allData.reduce((s, r) => s + (r.monto || 0), 0);
-  const con = allData.filter(r => r.tramite_edoc).length;
-  const sin = total - con;
-  setText('m-total', total);
-  setText('m-pres', fmt(pres));
-  setText('m-con', con);
-  setText('m-sin', sin);
-  setText('top-total', total);
-  setText('top-pres', fmt(pres));
-  setText('top-edoc', con + '/' + total);
-  const badge = document.getElementById('badge-alertas');
-  badge.textContent = sin;
-  badge.style.display = sin > 0 ? 'inline-block' : 'none';
-  renderCharts();
+function refresh() {
+  const t=A.length, p=A.reduce((s,r)=>s+(r.monto||0),0), con=A.filter(r=>r.tramite_edoc).length;
+  setText('m0',t); setText('m1',fmt(p)); setText('m2',con); setText('m3',t-con);
+  setText('tbt',t); setText('tbp',fmt(p)); setText('tbe',con+'/'+t);
+  const b=document.getElementById('nbadge');
+  b.textContent=t-con; b.style.display=t-con>0?'inline-block':'none';
+  rCharts();
 }
 
 // ── CHARTS ────────────────────────────────────────────────────────────────────
-function renderCharts() {
-  renderBar('chart-tipo', countBy('tipo'), ['#1d4ed8','#166534','#6b21a8','#c2410c','#9d174d']);
-  renderBar('chart-cuat', countBy('fecha_planificada'), ['#1e40af','#14532d','#854d0e']);
-  renderBar('chart-proc', countBy('fase'), ['#003B8E','#0056CC','#1a6de0','#4f8ef5','#93b8f5'], true);
-  // e-DOC estados
-  const linked = allData.filter(r => r.tramite_edoc);
-  const edocEst = {};
-  linked.forEach(r => { const e = r.estado_edoc || r.estado || 'Sin dato'; edocEst[e] = (edocEst[e]||0)+1; });
-  if (!linked.length) {
-    document.getElementById('chart-edoc-est').innerHTML = '<div style="font-size:11px;color:var(--text3);padding:10px 0">Sin trámites vinculados aún</div>';
-  } else {
-    renderBar('chart-edoc-est', Object.entries(edocEst).sort((a,b)=>b[1]-a[1]), ['#003B8E','#0056CC','#C8102E','#0a8754','#d97706']);
-  }
+function rCharts() {
+  rBar('ctipo', cntBy('tipo'), ['#1d4ed8','#166534','#6b21a8','#c2410c','#9d174d']);
+  rBar('ccuat', cntBy('fecha_planificada'), ['#1e40af','#14532d','#854d0e']);
+  rBar('cproc', cntBy('fase'), ['#003B8E','#0056CC','#1a6de0','#4f8ef5','#93b8f5'], true);
+  const lk=A.filter(r=>r.tramite_edoc), em={};
+  if (!lk.length) { document.getElementById('cedoc').innerHTML='<div style="font-size:11px;color:var(--text3);padding:8px 0">Sin trámites vinculados aún</div>'; return; }
+  lk.forEach(r=>{ const e=r.estado_edoc||r.estado||'Sin dato'; em[e]=(em[e]||0)+1; });
+  rBar('cedoc', Object.entries(em).sort((a,b)=>b[1]-a[1]), ['#003B8E','#0056CC','#C8102E','#0a8754']);
 }
-
-function countBy(field) {
-  const m = {};
-  allData.forEach(r => { const v = r[field] || 'N/D'; m[v] = (m[v]||0)+1; });
-  return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0, 6);
+function cntBy(f) {
+  const m={}; A.forEach(r=>{ const v=r[f]||'N/D'; m[v]=(m[v]||0)+1; });
+  return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,6);
 }
-
-function renderBar(id, data, colors, small = false) {
+function rBar(id, data, colors, sm=false) {
   if (!data.length) return;
-  const max = Math.max(...data.map(d => d[1]));
-  document.getElementById(id).innerHTML = data.map(([lbl, val], i) => `
-    <div class="bar-row">
-      <div class="bar-lbl" title="${esc(lbl)}">${esc(small && lbl.length > 18 ? lbl.substring(0,18)+'…' : lbl)}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(val/max*100)}%;background:${colors[i % colors.length]}"></div></div>
-      <div class="bar-val">${val}</div>
-    </div>`).join('');
+  const mx=Math.max(...data.map(d=>d[1]));
+  document.getElementById(id).innerHTML = data.map(([l,v],i)=>`
+    <div class="br"><div class="bl" title="${esc(l)}">${esc(sm&&l.length>20?l.slice(0,20)+'…':l)}</div>
+    <div class="bt"><div class="bf" style="width:${Math.round(v/mx*100)}%;background:${colors[i%colors.length]}"></div></div>
+    <div class="bv">${v}</div></div>`).join('');
 }
 
-// ── TABLE ─────────────────────────────────────────────────────────────────────
-function filterTable() {
-  const q = (document.getElementById('search').value || '').toLowerCase();
-  const tipo = document.getElementById('flt-tipo').value;
-  const edoc = document.getElementById('flt-edoc').value;
-  const hoja = document.getElementById('flt-hoja').value;
-  filtered = allData.filter(r => {
-    if (tipo && r.tipo !== tipo) return false;
-    if (edoc === 'con' && !r.tramite_edoc) return false;
-    if (edoc === 'sin' && r.tramite_edoc) return false;
-    if (hoja && r._hoja !== hoja) return false;
-    if (q) {
-      const hay = [r.descripcion, r.tipo, r.fase, r.tramite_edoc, r.partida, r.cpc].join(' ').toLowerCase();
-      if (!hay.includes(q)) return false;
-    }
+// ── TABLA ─────────────────────────────────────────────────────────────────────
+function ft() {
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  const tipo=document.getElementById('ftipo').value;
+  const edoc=document.getElementById('fedoc').value;
+  const hoja=document.getElementById('fhoja').value;
+  F=A.filter(r=>{
+    if(tipo&&r.tipo!==tipo)return false;
+    if(edoc==='con'&&!r.tramite_edoc)return false;
+    if(edoc==='sin'&&r.tramite_edoc)return false;
+    if(hoja&&r._hoja!==hoja)return false;
+    if(q){const h=[r.descripcion,r.tipo,r.fase,r.tramite_edoc,r.partida].join(' ').toLowerCase();if(!h.includes(q))return false;}
     return true;
   });
-  if (sortF) filtered.sort((a,b)=>{
-    let va=a[sortF]||'',vb=b[sortF]||'';
-    if(sortF==='monto'){va=a.monto||0;vb=b.monto||0}
-    return va<vb?-sortD:va>vb?sortD:0;
-  });
-  page = 1;
-  renderTable();
+  if(sF)F.sort((a,b)=>{let va=a[sF]||'',vb=b[sF]||'';if(sF==='monto'){va=a.monto||0;vb=b.monto||0}return va<vb?-sD:va>vb?sD:0});
+  pg=1; rTable();
 }
-
-function sortBy(f) {
-  if (sortF === f) sortD *= -1; else { sortF = f; sortD = 1; }
-  filterTable();
-}
-
-const TIPO_BADGE = { 'OBRAS':'obras','BIEN':'bien','SERVICIO':'servicio','CONSULTORIA':'consultoria','INFIMA CUANTIA':'infima' };
-const CUAT_BADGE = { 'Cuatrimestre I':'cuatI','Cuatrimestre II':'cuatII','Cuatrimestre III':'cuatIII' };
-const EDOC_DOT = { 'Nuevo':'dot-ok','En proceso':'dot-ok','Adjudicado':'dot-ok','Finalizado':'dot-gray','Desierto':'dot-err' };
-
-function renderTable() {
-  if (!filtered.length) filtered = [...allData];
-  const start = (page - 1) * PER_PAGE;
-  const slice = filtered.slice(start, start + PER_PAGE);
-  const total = filtered.length;
-  setText('page-info', `${start+1}–${Math.min(start+PER_PAGE,total)} de ${total} procesos`);
-  document.getElementById('prev-btn').disabled = page === 1;
-  document.getElementById('next-btn').disabled = start + PER_PAGE >= total;
-
-  document.getElementById('pac-tbody').innerHTML = slice.map((r, i) => {
-    const tipoBadge = TIPO_BADGE[r.tipo] || 'otro';
-    const cuatBadge = CUAT_BADGE[r.fecha_planificada] || 'otro';
-    // e-DOC cell
-    let edocCell = '';
-    if (r.tramite_edoc) {
-      const dot = EDOC_DOT[r.estado_edoc] || 'dot-gray';
-      const ultimo = r.ultimo_mov ? `<div style="font-size:10px;color:var(--text3);margin-top:2px">${esc(r.ultimo_mov)}</div>` : '';
-      edocCell = `<div class="edoc-cell">
-        <a class="edoc-num" href="${EDOC_BASE}${r.tramite_edoc}" target="_blank">#${r.tramite_edoc}</a>
-        <span class="btn-edoc-edit" onclick="openModal(${r._id})" title="Editar">✎</span>
-      </div>${ultimo}`;
-    } else {
-      edocCell = `<div class="edoc-cell">
-        <span class="btn-edoc-add" onclick="openModal(${r._id})" title="Vincular trámite">+</span>
-        <span style="font-size:11px;color:var(--text3)">Sin vincular</span>
-      </div>`;
-    }
-    // Estado e-DOC
-    let estadoCell = '';
-    if (r.tramite_edoc) {
-      const dot = EDOC_DOT[r.estado_edoc] || 'dot-gray';
-      const horas = r.horas_edoc ? `<div style="font-size:10px;color:var(--text3)">${r.horas_edoc.toFixed(0)}h sin mov.</div>` : '';
-      estadoCell = `<div style="display:flex;align-items:center;gap:5px">
-        <span class="estado-dot ${dot}"></span>
-        <span style="font-size:11px;color:var(--text2)">${esc(r.estado_edoc || r.estado || '—')}</span>
-      </div>${horas}`;
-    } else {
-      estadoCell = `<span style="font-size:11px;color:var(--text3)">—</span>`;
-    }
+function sb2(f){if(sF===f)sD*=-1;else{sF=f;sD=1;}ft();}
+function rTable(){
+  if(!F.length)F=[...A];
+  const s=(pg-1)*PP, sl=F.slice(s,s+PP), t=F.length;
+  document.getElementById('pinfo').textContent=`${s+1}–${Math.min(s+PP,t)} de ${t} procesos`;
+  document.getElementById('prev').disabled=pg===1;
+  document.getElementById('next').disabled=s+PP>=t;
+  document.getElementById('ptbody').innerHTML=sl.map((r,i)=>{
+    const tb=TBADGE[r.tipo]||'bOtro', cb=CBADGE[r.fecha_planificada]||'bOtro';
+    const ec = r.tramite_edoc
+      ? `<div class="ecell"><a class="elink" href="${EBASE}${r.tramite_edoc}" target="_blank">#${r.tramite_edoc}</a><span class="eedit" onclick="om(${r._id})" title="Editar">✎</span></div>${r.ultimo_mov?`<div style="font-size:10px;color:var(--text3);margin-top:1px">${esc(r.ultimo_mov)}</div>`:''}`
+      : `<div class="ecell"><span class="eadd" onclick="om(${r._id})" title="Vincular">+</span><span style="font-size:11px;color:var(--text3)">Sin vincular</span></div>`;
+    const est = r.tramite_edoc
+      ? `<div style="display:flex;align-items:center;gap:5px"><span class="edot ${EDOT[r.estado_edoc]||'dgray'}"></span><span style="font-size:11px;color:var(--text2)">${esc(r.estado_edoc||r.estado||'—')}</span></div>${r.horas_edoc?`<div style="font-size:10px;color:var(--text3)">${Math.round(r.horas_edoc)}h sin mov.</div>`:''}`
+      : `<span style="font-size:11px;color:var(--text3)">—</span>`;
     return `<tr>
-      <td style="color:var(--text3);font-size:11px">${start+i+1}</td>
-      <td><span class="badge ${tipoBadge}">${esc(r.tipo||'N/D')}</span></td>
-      <td class="main" style="max-width:300px" title="${esc(r.descripcion)}">${esc(r.descripcion.substring(0,70))}${r.descripcion.length>70?'…':''}</td>
+      <td style="color:var(--text3);font-size:11px">${s+i+1}</td>
+      <td><span class="badge ${tb}">${esc(r.tipo||'N/D')}</span></td>
+      <td class="main" style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(r.descripcion)}">${esc(r.descripcion.length>65?r.descripcion.slice(0,65)+'…':r.descripcion)}</td>
       <td class="mono" style="text-align:right;color:var(--text)">${fmtm(r.monto)}</td>
-      <td style="font-size:11px;color:var(--text2)">${esc((r.fase||'—').substring(0,18))}</td>
-      <td><span class="badge ${cuatBadge}">${esc(r.fecha_planificada||'—')}</span></td>
+      <td style="font-size:11px;color:var(--text2);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.fase||'—')}</td>
+      <td><span class="badge ${cb}">${esc(r.fecha_planificada||'—')}</span></td>
       <td style="font-size:10px;color:var(--text3)">${esc(r._hoja||'')}</td>
-      <td>${edocCell}</td>
-      <td>${estadoCell}</td>
+      <td>${ec}</td>
+      <td>${est}</td>
     </tr>`;
   }).join('');
 }
-
-function changePage(d) { page += d; renderTable(); }
+function cp(d){pg+=d;rTable();}
 
 // ── MODAL ─────────────────────────────────────────────────────────────────────
-function openModal(id) {
-  editId = id;
-  const r = allData.find(x => x._id === id);
-  if (!r) return;
-  document.getElementById('modal-desc').textContent = r.descripcion.substring(0, 100) + (r.descripcion.length > 100 ? '…' : '');
-  document.getElementById('modal-tramite').value = r.tramite_edoc || '';
-  document.getElementById('modal-estado').value = r.estado || 'Sin iniciar';
-  document.getElementById('modal-fase').value = r.fase || '';
-  document.getElementById('modal').classList.add('open');
-  setTimeout(() => document.getElementById('modal-tramite').focus(), 60);
+function om(id){
+  eid=id; const r=A.find(x=>x._id===id); if(!r)return;
+  document.getElementById('mdesc').textContent=r.descripcion.slice(0,100)+(r.descripcion.length>100?'…':'');
+  document.getElementById('mtramite').value=r.tramite_edoc||'';
+  document.getElementById('mestado').value=r.estado||'Sin iniciar';
+  document.getElementById('mfase').value=r.fase||'';
+  document.getElementById('ov').classList.add('open');
+  setTimeout(()=>document.getElementById('mtramite').focus(),60);
 }
-function closeModal() { document.getElementById('modal').classList.remove('open'); editId = null; }
-function saveLink() {
-  const r = allData.find(x => x._id === editId);
-  if (!r) return;
-  r.tramite_edoc = document.getElementById('modal-tramite').value.trim();
-  r.estado = document.getElementById('modal-estado').value;
-  r.fase = document.getElementById('modal-fase').value.trim();
-  save();
-  closeModal();
-  refreshAll();
-  filterTable();
-  showToast('Vínculo guardado', 'ok');
+function cm(){document.getElementById('ov').classList.remove('open');eid=null;}
+function sl(){
+  const r=A.find(x=>x._id===eid); if(!r)return;
+  r.tramite_edoc=document.getElementById('mtramite').value.trim();
+  r.estado=document.getElementById('mestado').value;
+  r.fase=document.getElementById('mfase').value.trim();
+  saveLinks(); cm(); refresh(); ft(); toast('Vínculo guardado','ok');
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-document.getElementById('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+document.addEventListener('keydown',e=>{if(e.key==='Escape')cm();});
+document.getElementById('ov').addEventListener('click',e=>{if(e.target.id==='ov')cm();});
 
 // ── ALERTAS ───────────────────────────────────────────────────────────────────
-function renderAlertas() {
-  const sin = allData.filter(r => !r.tramite_edoc);
-  document.getElementById('alertas-count').textContent = sin.length + ' procesos sin vincular';
-  if (!sin.length) {
-    document.getElementById('alertas-body').innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><h3>¡Todo vinculado!</h3><p>Todos los procesos tienen trámite e-DOC asignado.</p></div>';
-    return;
-  }
-  document.getElementById('alertas-body').innerHTML = `
-    <table style="width:100%">
-      <thead><tr>
-        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--border);background:var(--bg)">#</th>
-        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--border);background:var(--bg)">Tipo</th>
-        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--border);background:var(--bg)">Descripción</th>
-        <th style="padding:10px 14px;text-align:right;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--border);background:var(--bg)">Monto</th>
-        <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--border);background:var(--bg)">Procedimiento</th>
-        <th style="padding:10px 14px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--border);background:var(--bg)">Acción</th>
-      </tr></thead>
-      <tbody>
-        ${sin.map((r,i) => `<tr style="border-bottom:1px solid #f0f3f9">
-          <td style="padding:10px 14px;font-size:11px;color:var(--text3)">${i+1}</td>
-          <td style="padding:10px 14px"><span class="badge ${TIPO_BADGE[r.tipo]||'otro'}">${esc(r.tipo||'N/D')}</span></td>
-          <td style="padding:10px 14px;font-size:12px;font-weight:500;color:var(--text);max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(r.descripcion)}">${esc(r.descripcion.substring(0,65))}…</td>
-          <td style="padding:10px 14px;font-size:12px;font-family:monospace;text-align:right">${fmtm(r.monto)}</td>
-          <td style="padding:10px 14px;font-size:11px;color:var(--text2)">${esc(r.fase||'—')}</td>
-          <td style="padding:10px 14px;text-align:center"><button class="btn primary" style="font-size:11px;padding:5px 12px" onclick="showView('pac');setTimeout(()=>openModal(${r._id}),80)">Vincular</button></td>
-        </tr>`).join('')}
-      </tbody>
-    </table>`;
+function rAlertas(){
+  const sin=A.filter(r=>!r.tramite_edoc);
+  document.getElementById('acnt').textContent=sin.length+' procesos sin vincular';
+  if(!sin.length){document.getElementById('abody').innerHTML='<div style="text-align:center;padding:40px;font-size:13px;color:var(--green)">✓ Todos los procesos tienen vínculo e-DOC</div>';return;}
+  document.getElementById('abody').innerHTML=`<table style="width:100%"><thead><tr>${['#','Tipo','Descripción','Monto','Procedimiento','Acción'].map(h=>`<th style="padding:9px 12px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--border);background:var(--bg)">${h}</th>`).join('')}</tr></thead><tbody>${sin.map((r,i)=>`<tr style="border-bottom:1px solid #f0f3f9"><td style="padding:9px 12px;font-size:11px;color:var(--text3)">${i+1}</td><td style="padding:9px 12px"><span class="badge ${TBADGE[r.tipo]||'bOtro'}">${esc(r.tipo||'N/D')}</span></td><td style="padding:9px 12px;font-size:12px;font-weight:500;color:var(--text);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(r.descripcion)}">${esc(r.descripcion.slice(0,60))}…</td><td style="padding:9px 12px;font-family:monospace;font-size:12px">${fmtm(r.monto)}</td><td style="padding:9px 12px;font-size:11px;color:var(--text2)">${esc(r.fase||'—')}</td><td style="padding:9px 12px"><button class="btn pri" style="font-size:11px;padding:4px 10px" onclick="showView('pac');setTimeout(()=>om(${r._id}),80)">Vincular</button></td></tr>`).join('')}</tbody></table>`;
 }
 
 // ── REPORTE ───────────────────────────────────────────────────────────────────
-function renderReporte() {
-  const total = allData.length;
-  const pres = allData.reduce((s,r) => s+(r.monto||0), 0);
-  const con = allData.filter(r => r.tramite_edoc).length;
-  const pct = total ? Math.round(con/total*100) : 0;
-  const byTipo = {};
-  allData.forEach(r => { const t = r.tipo||'N/D'; if(!byTipo[t]) byTipo[t]={count:0,monto:0}; byTipo[t].count++; byTipo[t].monto+=r.monto||0; });
-  const fecha = new Date().toLocaleDateString('es-EC', { year:'numeric', month:'long', day:'numeric' });
-  document.getElementById('reporte-body').innerHTML = `
-    <div style="margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--azul)">
-      <div style="font-size:11px;color:var(--text3);margin-bottom:4px">GOBIERNO AUTÓNOMO DESCENTRALIZADO MUNICIPAL DE RIOBAMBA</div>
-      <div style="font-size:16px;font-weight:700;color:var(--azul)">Plan Anual de Contratación 2026</div>
-      <div style="font-size:12px;color:var(--text2);margin-top:2px">Dirección de Obras Públicas · Generado: ${fecha}</div>
+function rReporte(){
+  const t=A.length, p=A.reduce((s,r)=>s+(r.monto||0),0), con=A.filter(r=>r.tramite_edoc).length;
+  const bt={};A.forEach(r=>{const k=r.tipo||'N/D';if(!bt[k])bt[k]={n:0,m:0};bt[k].n++;bt[k].m+=r.monto||0;});
+  const d=new Date().toLocaleDateString('es-EC',{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('rbody').innerHTML=`
+    <div style="padding-bottom:14px;border-bottom:2px solid var(--azul);margin-bottom:20px">
+      <div style="font-size:11px;color:var(--text3)">GOBIERNO AUTÓNOMO DESCENTRALIZADO MUNICIPAL DE RIOBAMBA</div>
+      <div style="font-size:15px;font-weight:700;color:var(--azul);margin-top:2px">Plan Anual de Contratación 2026 — Dirección de Obras Públicas</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px">Generado: ${d}</div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
-      ${[['Total procesos',total,''],[`Presupuesto`,fmt(pres),''],[`Con e-DOC`,con,'color:var(--green)'],[`Vinculación`,pct+'%','']].map(([l,v,s]) => `
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px">
-        <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">${l}</div>
-        <div style="font-size:22px;font-weight:300;${s}">${v}</div>
-      </div>`).join('')}
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px">
+      ${[['Total',t,''],['Presupuesto',fmt(p),''],['Con e-DOC',con,'color:var(--green)'],['Vinculación',(t?Math.round(con/t*100):0)+'%','']].map(([l,v,s])=>`<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:13px"><div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:5px">${l}</div><div style="font-size:20px;font-weight:300;${s}">${v}</div></div>`).join('')}
     </div>
-    <table style="width:100%;border-collapse:collapse;font-size:12px">
-      <thead>
-        <tr style="background:var(--azul)">
-          <th style="padding:10px 12px;text-align:left;color:#fff;font-weight:600">Tipo</th>
-          <th style="padding:10px 12px;text-align:right;color:#fff;font-weight:600">Procesos</th>
-          <th style="padding:10px 12px;text-align:right;color:#fff;font-weight:600">Presupuesto</th>
-          <th style="padding:10px 12px;text-align:right;color:#fff;font-weight:600">% del total</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${Object.entries(byTipo).sort((a,b)=>b[1].monto-a[1].monto).map(([t,d],i) => `
-        <tr style="background:${i%2===0?'#fff':'var(--bg)'}">
-          <td style="padding:9px 12px;font-weight:500">${esc(t)}</td>
-          <td style="padding:9px 12px;text-align:right">${d.count}</td>
-          <td style="padding:9px 12px;text-align:right;font-family:monospace">${fmt(d.monto)}</td>
-          <td style="padding:9px 12px;text-align:right">${pres?Math.round(d.monto/pres*100):0}%</td>
-        </tr>`).join('')}
-        <tr style="background:var(--azulclaro);font-weight:700;border-top:2px solid var(--azul)">
-          <td style="padding:9px 12px">TOTAL</td>
-          <td style="padding:9px 12px;text-align:right">${total}</td>
-          <td style="padding:9px 12px;text-align:right;font-family:monospace">${fmt(pres)}</td>
-          <td style="padding:9px 12px;text-align:right">100%</td>
-        </tr>
-      </tbody>
-    </table>`;
+    <table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:var(--azul)">${['Tipo','Procesos','Presupuesto','% Total'].map(h=>`<th style="padding:9px 12px;color:#fff;font-weight:600;text-align:${h==='Procesos'||h==='% Total'?'right':'left'}">${h}</th>`).join('')}</tr></thead><tbody>${Object.entries(bt).sort((a,b)=>b[1].m-a[1].m).map(([t,d],i)=>`<tr style="background:${i%2?'var(--bg)':'#fff'}"><td style="padding:9px 12px;font-weight:500">${esc(t)}</td><td style="padding:9px 12px;text-align:right">${d.n}</td><td style="padding:9px 12px;text-align:right;font-family:monospace">${fmt(d.m)}</td><td style="padding:9px 12px;text-align:right">${p?Math.round(d.m/p*100):0}%</td></tr>`).join('')}<tr style="background:var(--azulclaro);font-weight:700;border-top:2px solid var(--azul)"><td style="padding:9px 12px">TOTAL</td><td style="padding:9px 12px;text-align:right">${t}</td><td style="padding:9px 12px;text-align:right;font-family:monospace">${fmt(p)}</td><td style="padding:9px 12px;text-align:right">100%</td></tr></tbody></table>`;
 }
 
-// ── CHAT ──────────────────────────────────────────────────────────────────────
-function toggleChat() {
-  chatOpen = !chatOpen;
-  document.getElementById('chat-panel').classList.toggle('hidden', !chatOpen);
+// ── CARGAR PAC ────────────────────────────────────────────────────────────────
+function doDrop(e){e.preventDefault();e.currentTarget.style.borderColor='var(--border)';const f=e.dataTransfer.files[0];if(f)procFile(f);}
+function doFile(e){const f=e.target.files[0];if(f)procFile(f);e.target.value='';}
+function procFile(file){
+  const dv=document.getElementById('udir').value, dc=document.getElementById('udircustom').value.trim();
+  const dir=dv==='__otro'?dc:dv;
+  if(!dir){toast('Selecciona la dirección primero','err');return;}
+  const rd=new FileReader();
+  rd.onload=function(e){
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary',cellDates:true});
+      let parsed=[];
+      for(const sn of wb.SheetNames){
+        const ws=wb.Sheets[sn];
+        const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+        if(rows.length<3)continue;
+        let hIdx=-1;
+        for(let i=0;i<Math.min(rows.length,15);i++){
+          const cells=rows[i].map(c=>String(c).toUpperCase().trim());
+          if(cells.includes('DETALLE_PRODUCTO')||cells.includes('CUENTA_CONTABLE')){hIdx=i;break;}
+        }
+        if(hIdx<0)continue;
+        const hdrs=rows[hIdx].map(c=>String(c).trim().toUpperCase());
+        const ci=n=>hdrs.indexOf(n);
+        const SK=['elaborado','revisado','aprobado','mgs.','ing.','lcdo'];
+        let ix=Date.now();
+        for(let i=hIdx+1;i<rows.length;i++){
+          const r=rows[i];
+          if(!r.some(c=>c!==''))continue;
+          const f0=String(r[0]||'').toLowerCase();
+          if(SK.some(w=>f0.includes(w)))continue;
+          const desc=ci('DETALLE_PRODUCTO')>=0?String(r[ci('DETALLE_PRODUCTO')]||'').trim():'';
+          if(!desc)continue;
+          const m=parseFloat(String(r[ci('COSTO')]||'0').replace(/[^0-9.-]/g,''))||0;
+          let fe='';
+          if(ci('CUATRIMESTRE_I')>=0&&String(r[ci('CUATRIMESTRE_I')]||'').trim())fe='Cuatrimestre I';
+          else if(ci('CUATRIMESTRE_II')>=0&&String(r[ci('CUATRIMESTRE_II')]||'').trim())fe='Cuatrimestre II';
+          else if(ci('CUATRIMESTRE_III')>=0&&String(r[ci('CUATRIMESTRE_III')]||'').trim())fe='Cuatrimestre III';
+          parsed.push({_id:ix++,_dir:dir,_hoja:sn,num_pac:'2026',descripcion:desc,
+            tipo:ci('TIPO_COMPRA')>=0?String(r[ci('TIPO_COMPRA')]||'').trim():'',
+            monto:m,estado:'Sin iniciar',
+            fase:ci('PROCEDIMIENTO_SUGERIDO')>=0?String(r[ci('PROCEDIMIENTO_SUGERIDO')]||'').trim():'',
+            responsable:'',fecha_planificada:fe,partida:ci('CUENTA_CONTABLE')>=0?String(r[ci('CUENTA_CONTABLE')]||'').trim():'',
+            cpc:ci('CODIGO_CPC')>=0?String(r[ci('CODIGO_CPC')]||'').trim():'',
+            tramite_edoc:'',estado_edoc:'',fase_edoc:''});
+        }
+      }
+      if(!parsed.length){toast('No se encontraron procesos','err');return;}
+      A=A.filter(r=>r._dir!==dir).concat(parsed);
+      saveLinks(); refresh(); F=[...A]; rDirList();
+      toast(parsed.length+' procesos de '+dir,'ok');
+    }catch(err){toast('Error: '+err.message,'err');}
+  };
+  rd.readAsBinaryString(file);
 }
-function chatKey(e) { if (e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();} }
-async function sendChat() {
-  const inp = document.getElementById('chat-input');
-  const msg = inp.value.trim();
-  if (!msg) return;
-  const key = localStorage.getItem('pac_apikey');
-  appendMsg('user', msg);
-  inp.value = '';
-  if (!key) { appendMsg('ai','Ingresa tu Claude API Key en el menú lateral para usar el asistente.'); return; }
-  const typing = appendMsg('ai','<span class="typing"><span></span><span></span><span></span></span>');
-  const ctx = `Eres asistente del PAC Monitor del GADMR. PAC 2026 Obras Públicas: ${allData.length} procesos, presupuesto total ${fmt(allData.reduce((s,r)=>s+(r.monto||0),0))}, ${allData.filter(r=>r.tramite_edoc).length} vinculados al e-DOC. Responde en español, conciso.`;
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:800,system:ctx,messages:[{role:'user',content:msg}]})});
-    const data = await res.json();
-    typing.querySelector('.bubble').innerHTML = (data.content?.[0]?.text||'Sin respuesta').replace(/
-/g,'<br>');
-  } catch(e) { typing.querySelector('.bubble').textContent = 'Error de conexión.'; }
+function rDirList(){
+  const dirs=[...new Set(A.map(r=>r._dir))];
+  const el=document.getElementById('dirlist');if(!el)return;
+  el.innerHTML=dirs.length?'<div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Direcciones cargadas</div>'+
+    dirs.map(d=>{const n=A.filter(r=>r._dir===d).length,m=A.filter(r=>r._dir===d).reduce((s,r)=>s+(r.monto||0),0);
+      return `<div style="display:flex;align-items:center;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:10px 14px;margin-bottom:7px;gap:12px"><div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--text)">${esc(d)}</div><div style="font-size:11px;color:var(--text3);margin-top:2px">${n} procesos · ${fmt(m)}</div></div><button class="btn" style="font-size:11px;padding:4px 10px;color:var(--rojo);border-color:rgba(200,16,46,.3)" onclick="remDir('${d}')">Eliminar</button></div>`;
+    }).join(''):'<div style="font-size:12px;color:var(--text3)">Solo se muestran los datos incrustados de Obras Públicas.</div>';
 }
-function appendMsg(role, html) {
-  const msgs = document.getElementById('chat-msgs');
-  const d = document.createElement('div');
-  d.className = 'cmsg ' + role;
-  d.innerHTML = `<div class="bubble">${html}</div>`;
-  msgs.appendChild(d);
-  msgs.scrollTop = msgs.scrollHeight;
-  return d;
+function remDir(dir){
+  if(dir==='Dirección de Obras Públicas'){toast('No se puede eliminar el PAC principal','err');return;}
+  if(!confirm('¿Eliminar "'+dir+'"?'))return;
+  A=A.filter(r=>r._dir!==dir);saveLinks();refresh();rDirList();toast('Eliminado','ok');
+}
+
+// ── SYNC e-DOC ────────────────────────────────────────────────────────────────
+async function syncEdoc(){
+  const lk=A.filter(r=>r.tramite_edoc);
+  if(!lk.length){toast('Sin trámites vinculados aún','err');return;}
+  toast('Sincronizando...');
+  try{
+    const res=await fetch(EURL+'?_='+Date.now());
+    const json=await res.json();
+    const trs=json.tramites||[];
+    let n=0;
+    A.forEach(r=>{
+      if(!r.tramite_edoc)return;
+      const t=trs.find(t=>String(t.numero)===String(r.tramite_edoc));
+      if(t){r.estado_edoc=t.estado_edoc||'';r.horas_edoc=t.horas_sin_movimiento||0;r.ultimo_mov=t.ultimo_movimiento?.fecha||'';n++;}
+    });
+    const ts=new Date().toLocaleTimeString('es-EC',{hour:'2-digit',minute:'2-digit'});
+    setText('m4',ts);saveLinks();refresh();if(F.length)ft();
+    toast(n+' trámites actualizados','ok');
+  }catch(e){toast('Error de conexión al e-DOC','err');}
+}
+function sched(){
+  const now=new Date(),h=now.getHours();
+  const slots=[6,10,14,18],next=slots.find(s=>s>h)||(slots[0]+24);
+  const ms=((next-h-1)*3600+(60-now.getMinutes())*60-now.getSeconds())*1000;
+  setTimeout(()=>{syncEdoc();sched();},ms);
 }
 
 // ── EXPORT ────────────────────────────────────────────────────────────────────
-function exportExcel() {
-  const rows = allData.map(r => ({'Descripción':r.descripcion,'Tipo':r.tipo,'Monto':r.monto,'Procedimiento':r.fase,'Cuatrimestre':r.fecha_planificada,'Partida':r.partida,'CPC':r.cpc,'Hoja':r._hoja,'Trámite e-DOC':r.tramite_edoc,'Estado':r.estado,'Estado e-DOC':r.estado_edoc||'','Últ. movimiento':r.ultimo_mov||''}));
-  const ws = XLSX.utils.json_to_sheet(rows);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'PAC2026');
-  XLSX.writeFile(wb, 'PAC_GADMR_ObrasPub_2026.xlsx');
-  showToast('Exportado', 'ok');
+function exportExcel(){
+  const rows=A.map(r=>({'Descripción':r.descripcion,'Tipo':r.tipo,'Monto':r.monto,'Procedimiento':r.fase,'Cuatrimestre':r.fecha_planificada,'Partida':r.partida,'CPC':r.cpc,'Hoja':r._hoja,'Dirección':r._dir,'Trámite e-DOC':r.tramite_edoc,'Estado':r.estado,'Estado e-DOC':r.estado_edoc||''}));
+  const ws=XLSX.utils.json_to_sheet(rows),wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'PAC2026');
+  XLSX.writeFile(wb,'PAC_GADMR_ObrasPub_2026.xlsx');
+  toast('Exportado','ok');
+}
+
+// ── CHAT ──────────────────────────────────────────────────────────────────────
+function toggleChat(){chatOpen=!chatOpen;document.getElementById('chat').classList.toggle('hidden',!chatOpen);}
+function ckey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();csend();}}
+async function csend(){
+  const inp=document.getElementById('cinput'),msg=inp.value.trim();if(!msg)return;
+  const key=localStorage.getItem('pac_apikey');
+  cadd('user',msg);inp.value='';
+  if(!key){cadd('ai','Ingresa tu Claude API Key en el panel lateral para usar el asistente.');return;}
+  const typing=cadd('ai','<span class="typ"><span></span><span></span><span></span></span>');
+  const ctx=`PAC Monitor GADMR 2026 Obras Públicas: ${A.length} procesos, presupuesto ${fmt(A.reduce((s,r)=>s+(r.monto||0),0))}, ${A.filter(r=>r.tramite_edoc).length} vinculados al e-DOC. Responde en español, conciso.`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:800,system:ctx,messages:[{role:'user',content:msg}]})});
+    const d=await r.json();
+    typing.querySelector('.bbl').innerHTML=(d.content?.[0]?.text||'Sin respuesta').replace(/\n/g,'<br>');
+  }catch(e){typing.querySelector('.bbl').textContent='Error de conexión.';}
+}
+function cadd(role,html){
+  const m=document.getElementById('cmsgs'),d=document.createElement('div');
+  d.className='cmsg '+role;d.innerHTML=`<div class="bbl">${html}</div>`;
+  m.appendChild(d);m.scrollTop=m.scrollHeight;return d;
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
-function setText(id, v) { const e=document.getElementById(id); if(e) e.textContent=v; }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function fmt(n) { return n>=1000000?'$'+(n/1000000).toFixed(2)+'M':n>=1000?'$'+Math.round(n).toLocaleString('es-EC'):'$'+(n||0).toFixed(0); }
-function fmtm(n) { return n?'$'+Math.round(n).toLocaleString('es-EC'):'—'; }
-function showToast(msg, type='ok') {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='show '+(type||'');
-  setTimeout(()=>t.className='',2800);
-}
-
-// ── PRELOAD ───────────────────────────────────────────────────────────────────
-(function(){
-  const stored = localStorage.getItem('pac_gadmr_v2');
-  if (!stored || JSON.parse(stored).length === 0) {
-    localStorage.setItem('pac_gadmr_v2', JSON.stringify(PAC_DATA_INICIAL));
-  }
-})();
+function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmt(n){return n>=1000000?'$'+(n/1000000).toFixed(2)+'M':n>=1000?'$'+Math.round(n).toLocaleString('es-EC'):'$'+(n||0).toFixed(0);}
+function fmtm(n){return n?'$'+Math.round(n).toLocaleString('es-EC'):'—';}
+function toast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='show '+(type||'');setTimeout(()=>t.className='',2800);}
 </script>
 </body>
 </html>
