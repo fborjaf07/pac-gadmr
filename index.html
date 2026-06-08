@@ -574,28 +574,33 @@ function saveLinks() {
   pushLinksToGitHub(links);
 }
 
-async function pushLinksToGitHub(links) {
+async function pushLinksToGitHub(localLinks) {
   try {
-    const content = btoa(unescape(encodeURIComponent(JSON.stringify(links, null, 2))));
-    // Obtener SHA actual del archivo (necesario para actualizarlo)
+    // 1. Leer el archivo actual de GitHub para hacer MERGE
     let sha = null;
+    let remoteLinks = {};
     try {
       const r = await fetch(GH_API, { headers: { 'Authorization': 'token ' + _gt(), 'Accept': 'application/vnd.github.v3+json' }});
-      if (r.ok) { const d = await r.json(); sha = d.sha; }
+      if (r.ok) {
+        const d = await r.json();
+        sha = d.sha;
+        // Decodificar contenido actual
+        remoteLinks = JSON.parse(decodeURIComponent(escape(atob(d.content.replace(/\n/g,'')))));
+      }
     } catch(e) {}
-    const body = { message: 'update pac_links', content };
+    // 2. Merge: remote como base, local sobreescribe sus propios IDs
+    const merged = Object.assign({}, remoteLinks, localLinks);
+    // 3. Guardar merged
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(merged, null, 2))));
+    const body = { message: 'update pac_links', content: encoded };
     if (sha) body.sha = sha;
     const res = await fetch(GH_API, {
       method: 'PUT',
       headers: { 'Authorization': 'token ' + _gt(), 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
       body: JSON.stringify(body)
     });
-    if (res.ok) {
-      console.log('pac_links.json guardado en GitHub');
-    } else {
-      const err = await res.json();
-      console.error('GitHub error:', err.message);
-    }
+    if (res.ok) console.log('pac_links.json guardado en GitHub (' + Object.keys(merged).length + ' vínculos)');
+    else { const err = await res.json(); console.error('GitHub error:', err.message); }
   } catch(e) {
     console.error('Error guardando en GitHub:', e);
   }
