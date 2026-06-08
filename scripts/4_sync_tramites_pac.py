@@ -25,10 +25,15 @@ USUARIO      = os.environ["EDOC_USUARIO"]
 CONTRASENA   = os.environ["EDOC_CONTRASENA"]
 
 # ── HTTP con cookies ──────────────────────────────────────────────────────────
+import ssl
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
+
 jar = CookieJar()
 opener = urllib.request.build_opener(
     urllib.request.HTTPCookieProcessor(jar),
-    urllib.request.HTTPSHandler(context=__import__('ssl').create_default_context())
+    urllib.request.HTTPSHandler(context=ctx)
 )
 opener.addheaders = [
     ("User-Agent", "Mozilla/5.0 (PAC-Monitor-Bot/1.0)"),
