@@ -11,27 +11,25 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.PAC_GADMR_TOKEN }}
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
+      - name: Instalar Playwright
+        run: |
+          pip install playwright
+          playwright install chromium
+          playwright install-deps chromium
 
       - name: Ejecutar sync
         env:
           EDOC_USUARIO:    ${{ secrets.EDOC_USUARIO }}
           EDOC_CONTRASENA: ${{ secrets.EDOC_CONTRASENA }}
+          PAC_GADMR_TOKEN: ${{ secrets.PAC_GADMR_TOKEN }}
         run: python scripts/4_sync_tramites_pac.py
-
-      - name: Commit tramites_pac.json
-        run: |
-          git config user.name "PAC Monitor Bot"
-          git config user.email "pac-bot@gadmr.gob.ec"
-          git add tramites_pac.json
-          git diff --staged --quiet || git commit -m "sync: tramites_pac $(date -u '+%Y-%m-%d %H:%M UTC')"
-          git push
