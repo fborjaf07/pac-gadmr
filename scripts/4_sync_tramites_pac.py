@@ -1,144 +1,58 @@
 #!/usr/bin/env python3
-"""
-4_sync_tramites_pac.py
-----------------------
-Login directo al e-DOC via CAS, extrae historial de cada trámite
-vinculado al PAC y genera tramites_pac.json en este mismo repo.
-
-Secrets requeridos en pac-gadmr:
-  EDOC_USUARIO     — usuario e-DOC
-  EDOC_CONTRASENA  — contraseña e-DOC
-  PAC_GADMR_TOKEN  — GitHub PAT con permisos repo
-"""
-
-import json, os, re, time, urllib.request, urllib.parse, urllib.error
+import json, os, re, time, base64, urllib.request
 from datetime import datetime, timezone
-from http.cookiejar import CookieJar
+from playwright.sync_api import sync_playwright
 
-# ── CONFIG ────────────────────────────────────────────────────────────────────
-CAS_URL      = "https://egob.gadmriobamba.gob.ec:8443/cas/login"
-EDOC_BASE    = "http://egobedoc.gadmriobamba.gob.ec:8081"
-EDOC_SERVICE = f"{EDOC_BASE}/login/cas"
-PAC_LINKS    = "pac_links.json"
-OUTPUT       = "tramites_pac.json"
-USUARIO      = os.environ["EDOC_USUARIO"]
-CONTRASENA   = os.environ["EDOC_CONTRASENA"]
+CAS_URL    = "https://egob.gadmriobamba.gob.ec:8443/cas/login"
+EDOC_BASE  = "http://egobedoc.gadmriobamba.gob.ec:8081"
+USUARIO    = os.environ["EDOC_USUARIO"]
+CONTRASENA = os.environ["EDOC_CONTRASENA"]
+OUTPUT     = "tramites_pac.json"
 
-# ── HTTP con cookies ──────────────────────────────────────────────────────────
-import ssl
-ctx = ssl.create_default_context()
-ctx.check_hostname = False
-ctx.verify_mode = ssl.CERT_NONE
-
-jar = CookieJar()
-opener = urllib.request.build_opener(
-    urllib.request.HTTPCookieProcessor(jar),
-    urllib.request.HTTPSHandler(context=ctx)
-)
-opener.addheaders = [
-    ("User-Agent", "Mozilla/5.0 (PAC-Monitor-Bot/1.0)"),
-    ("Accept", "text/html,application/xhtml+xml"),
-]
-
-def get(url, timeout=30):
-    with opener.open(url, timeout=timeout) as r:
-        return r.read().decode("utf-8", errors="replace")
-
-def post(url, data, timeout=30):
-    body = urllib.parse.urlencode(data).encode()
-    req = urllib.request.Request(url, data=body, method="POST")
-    req.add_header("Content-Type", "application/x-www-form-urlencoded")
-    with opener.open(req, timeout=timeout) as r:
-        return r.read().decode("utf-8", errors="replace")
-
-# ── Login CAS ─────────────────────────────────────────────────────────────────
-def login():
+def login(page):
     print("[...] Login CAS")
-    # 1. GET login page → obtener execution token
-    login_url = f"{CAS_URL}?service={urllib.parse.quote(EDOC_SERVICE)}"
-    html = get(login_url)
-    m = re.search(r'name="execution"\s+value="([^"]+)"', html)
-    if not m:
-        raise Exception("No se encontró execution token en CAS")
-    execution = m.group(1)
-    # 2. POST credenciales
-    post(login_url, {
-        "username":  USUARIO,
-        "password":  CONTRASENA,
-        "execution": execution,
-        "_eventId":  "submit",
-        "geolocation": ""
-    })
-    # 3. Acceder al e-DOC para establecer sesión
-    get(EDOC_SERVICE)
-    get(f"{EDOC_BASE}/my/pmy")
+    page.goto(f"{CAS_URL}?service={EDOC_BASE}/login/cas", wait_until="networkidle")
+    page.fill('input[name="username"]', USUARIO)
+    page.fill('input[name="password"]', CONTRASENA)
+    page.click('input[type="submit"]')
+    page.wait_for_url(f"{EDOC_BASE}/**", timeout=15000)
     print("[OK] Login exitoso")
 
-# ── Extraer historial de un trámite ──────────────────────────────────────────
-def extraer_tramite(numero):
-    url = f"{EDOC_BASE}/issues/{numero}"
+def extraer_tramite(page, numero):
     try:
-        html = get(url, timeout=20)
+        page.goto(f"{EDOC_BASE}/issues/{numero}", wait_until="domcontentloaded", timeout=20000)
+        if "cas/login" in page.url:
+            return {"numero": numero, "encontrado": False, "error": "Sesion expirada",
+                    "movimientos": [], "estado_edoc": "", "descripcion": ""}
+        html = page.content()
     except Exception as e:
         return {"numero": numero, "encontrado": False, "error": str(e),
                 "movimientos": [], "estado_edoc": "", "descripcion": ""}
 
-    if "login" in html.lower() and "cas" in html.lower():
-        return {"numero": numero, "encontrado": False, "error": "Sesión expirada",
-                "movimientos": [], "estado_edoc": "", "descripcion": ""}
-
-    # Descripción
     desc = ""
-    m = re.search(r'<div[^>]*class="[^"]*subject[^"]*"[^>]*>(.*?)</div>', html, re.S)
-    if m: desc = re.sub(r'<[^>]+>', '', m.group(1)).strip()
-    if not desc:
-        m = re.search(r'<title>(.*?)</title>', html, re.S)
-        if m: desc = re.sub(r'<[^>]+>', '', m.group(1)).strip()
+    try: desc = page.locator(".subject").first.inner_text().strip()
+    except: pass
 
-    # Estado
     estado = ""
-    m = re.search(r'Estado[^\:]*:\s*</[^>]+>\s*<[^>]+>(.*?)</[^>]+>', html, re.S)
-    if m: estado = re.sub(r'<[^>]+>', '', m.group(1)).strip()
-    if not estado:
-        m = re.search(r'class="[^"]*status[^"]*"[^>]*>(.*?)</[^>]+>', html, re.S)
-        if m: estado = re.sub(r'<[^>]+>', '', m.group(1)).strip()
+    try: estado = page.locator(".status").first.inner_text().strip()
+    except: pass
 
-    # Movimientos del historial
     movimientos = []
-    # Buscar bloques del historial interno
-    hist_match = re.search(
-        r'Hist[oó]rico\s*\(Interno\)(.*?)(?:Hist[oó]rico\s*\(Externo\)|$)',
-        html, re.S | re.I
-    )
-    bloque = hist_match.group(1) if hist_match else html
-
-    # Patrón de cada movimiento
     pat = re.compile(
         r'\(\s*\d+\s*\)\s*#\d+\s+(.*?)\s*\((.*?)\)\s*'
-        r'(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})'
-        r'(.*?)(?=\(\s*\d+\s*\)\s*#\d+|\Z)',
-        re.S
-    )
-    for m in pat.finditer(bloque):
-        nombre = m.group(1).strip()
-        cargo  = m.group(2).strip()
-        fecha  = m.group(3).strip()
-        resto  = m.group(4)
-        # Nota
-        nota_m = re.search(r'Nota[:\s]+(.*?)(?:Documento|Asignado|$)', resto, re.S)
-        nota = re.sub(r'<[^>]+>', '', nota_m.group(1)).strip() if nota_m else ""
-        # Enviado a
-        env_m = re.search(r'Enviado a\s+(.*?)(?:\n|$)', resto, re.S)
+        r'(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})(.*?)(?=\(\s*\d+\s*\)\s*#\d+|\Z)', re.S)
+    for m in pat.finditer(html):
+        nombre  = re.sub(r'<[^>]+>', '', m.group(1)).strip()
+        cargo   = re.sub(r'<[^>]+>', '', m.group(2)).strip()
+        fecha   = m.group(3).strip()
+        resto   = m.group(4)
+        nota_m  = re.search(r'Nota[:\s]+(.*?)(?:Documento|Asignado|$)', resto, re.S)
+        nota    = re.sub(r'<[^>]+>', '', nota_m.group(1)).strip()[:300] if nota_m else ""
+        env_m   = re.search(r'Enviado a\s+(.*?)(?:\n|<)', resto, re.S)
         enviado = re.sub(r'<[^>]+>', '', env_m.group(1)).strip() if env_m else ""
-        movimientos.append({
-            "nombre":    re.sub(r'<[^>]+>', '', nombre),
-            "cargo":     re.sub(r'<[^>]+>', '', cargo),
-            "fecha":     fecha,
-            "nota":      nota[:300] if nota else "",
-            "enviado_a": re.sub(r'<[^>]+>', '', enviado)
-        })
+        movimientos.append({"nombre": nombre, "cargo": cargo, "fecha": fecha,
+                             "nota": nota, "enviado_a": enviado})
 
-    # Último movimiento y horas sin movimiento
     ultimo = movimientos[0] if movimientos else None
     horas = None
     if ultimo:
@@ -147,61 +61,81 @@ def extraer_tramite(numero):
             horas = round((datetime.now() - dt).total_seconds() / 3600, 1)
         except: pass
 
-    return {
-        "numero":              numero,
-        "encontrado":          True,
-        "descripcion":         desc[:200],
-        "estado_edoc":         estado,
-        "horas_sin_movimiento": horas,
-        "tiempo_texto":        f"{int(horas)}h" if horas else "",
-        "movimientos":         movimientos,
-        "ultimo_movimiento":   ultimo,
-        "error":               None
-    }
+    return {"numero": numero, "encontrado": True, "descripcion": desc[:200],
+            "estado_edoc": estado, "horas_sin_movimiento": horas,
+            "tiempo_texto": f"{int(horas)}h" if horas else "",
+            "movimientos": movimientos, "ultimo_movimiento": ultimo, "error": None}
 
-# ── Main ──────────────────────────────────────────────────────────────────────
+def subir_github(data):
+    token = os.environ.get("PAC_GADMR_TOKEN", "")
+    if not token:
+        print("[WARN] Sin PAC_GADMR_TOKEN")
+        return
+    repo  = "fborjaf07/pac-gadmr"
+    fname = "tramites_pac.json"
+    url   = f"https://api.github.com/repos/{repo}/contents/{fname}"
+    content = base64.b64encode(json.dumps(data, ensure_ascii=False, indent=2).encode()).decode()
+    sha = None
+    try:
+        req = urllib.request.Request(url, headers={
+            "Authorization": f"token {token}",
+            "Accept": "application/vnd.github.v3+json"})
+        sha = json.loads(urllib.request.urlopen(req).read())["sha"]
+    except: pass
+    body = {"message": "sync: tramites_pac", "content": content}
+    if sha: body["sha"] = sha
+    req2 = urllib.request.Request(url, data=json.dumps(body).encode(), method="PUT",
+        headers={"Authorization": f"token {token}", "Content-Type": "application/json",
+                 "Accept": "application/vnd.github.v3+json"})
+    urllib.request.urlopen(req2)
+    print(f"[OK] tramites_pac.json subido a {repo}")
+
 if __name__ == "__main__":
     print("=" * 60)
-    print(f"Sync Trámites PAC — {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+    print(f"Sync Tramites PAC — {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     print("=" * 60)
 
-    # Leer pac_links.json
-    if not os.path.exists(PAC_LINKS):
-        print(f"[WARN] {PAC_LINKS} no existe — sin vínculos aún")
-        resultado = {}
-    else:
-        with open(PAC_LINKS, encoding="utf-8") as f:
-            links = json.load(f)
+    numeros = []
+    try:
+        url = f"https://raw.githubusercontent.com/fborjaf07/pac-gadmr/main/pac_links.json?_={int(time.time())}"
+        links = json.loads(urllib.request.urlopen(url).read())
         numeros = sorted(set(
             str(v.get("tramite_edoc","")).strip()
-            for v in links.values()
-            if v.get("tramite_edoc","").strip()
+            for v in links.values() if v.get("tramite_edoc","").strip()
         ))
-        print(f"[OK] {len(numeros)} trámites a extraer: {numeros}")
+        print(f"[OK] {len(numeros)} tramites a extraer: {numeros}")
+    except Exception as e:
+        print(f"[ERROR] pac_links.json: {e}")
 
-        if not numeros:
-            resultado = {}
-        else:
-            login()
-            resultado = {}
+    if not numeros:
+        output = {"timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S"),
+                  "total_vinculados": 0, "total_encontrados": 0, "tramites": {}}
+        with open(OUTPUT, "w") as f:
+            json.dump(output, f)
+        print("[OK] Sin vinculos — tramites_pac.json vacio")
+    else:
+        resultado = {}
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_context(ignore_https_errors=True).new_page()
+            login(page)
             for i, num in enumerate(numeros, 1):
-                print(f"[{i}/{len(numeros)}] Extrayendo trámite #{num}...")
-                t = extraer_tramite(num)
+                print(f"[{i}/{len(numeros)}] #{num}")
+                t = extraer_tramite(page, num)
                 resultado[num] = t
-                found = "✓" if t["encontrado"] else "✗"
-                movs  = len(t.get("movimientos", []))
-                print(f"  {found} estado={t['estado_edoc']!r} movimientos={movs}")
-                time.sleep(0.5)  # Cortesía al servidor
+                print(f"  {'OK' if t['encontrado'] else 'ERROR'} | estado={t['estado_edoc']!r} | movs={len(t.get('movimientos',[]))}")
+                time.sleep(0.3)
+            browser.close()
 
-    output = {
-        "timestamp":        datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S"),
-        "total_vinculados": len(resultado),
-        "total_encontrados": sum(1 for v in resultado.values() if v.get("encontrado")),
-        "tramites":         resultado
-    }
+        output = {
+            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S"),
+            "total_vinculados": len(resultado),
+            "total_encontrados": sum(1 for v in resultado.values() if v.get("encontrado")),
+            "tramites": resultado
+        }
+        with open(OUTPUT, "w", encoding="utf-8") as f:
+            json.dump(output, f, ensure_ascii=False, indent=2)
+        print(f"[OK] {output['total_encontrados']}/{output['total_vinculados']} encontrados")
+        subir_github(output)
 
-    with open(OUTPUT, "w", encoding="utf-8") as f:
-        json.dump(output, f, ensure_ascii=False, indent=2)
-
-    print(f"\n[OK] {OUTPUT}: {output['total_encontrados']}/{output['total_vinculados']} encontrados")
     print("=" * 60)
