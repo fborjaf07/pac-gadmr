@@ -168,6 +168,58 @@ td.mono{font-family:monospace;font-size:11px}
 .upzone:hover{border-color:var(--azul);background:var(--azulclaro)}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-thumb{background:#d0d7e8;border-radius:3px}
+
+/* ── RESPONSIVE MÓVIL ───────────────────────────────── */
+@media(max-width:768px){
+  :root{--sidebar:100%}
+  #app{flex-direction:column}
+  #sb{width:100%;height:auto;flex-direction:column}
+  .logo{padding:12px 14px 10px;display:flex;align-items:center;gap:10px}
+  .logo-icon{font-size:22px;margin-bottom:0}
+  .logo-title{font-size:13px}
+  .logo-sub{font-size:10px}
+  .logo-tag{margin-top:0;margin-left:auto}
+  /* Nav horizontal scrollable */
+  .nav-mobile-wrap{display:flex;overflow-x:auto;padding:4px 8px 8px;gap:4px;-webkit-overflow-scrolling:touch}
+  .nav-mobile-wrap::-webkit-scrollbar{display:none}
+  .ns{display:none}
+  .ni{padding:7px 12px;border-radius:20px;border-left:none!important;white-space:nowrap;font-size:12px;background:rgba(255,255,255,0.07)}
+  .ni.on{background:var(--rojo);color:#fff;border-left:none!important}
+  .ni svg{width:13px;height:13px}
+  .sb-bottom{padding:8px 12px;display:flex;align-items:center;gap:8px}
+  .aklabel{display:none}
+  .akinput{flex:1;font-size:11px}
+  /* Botones sistema en móvil */
+  .sys-mobile{display:flex;gap:4px;padding:0 8px 8px}
+  .sys-mobile .ni{padding:5px 10px;font-size:11px}
+  /* Main ocupa todo */
+  #main{flex:1;overflow:hidden}
+  #topbar{height:auto;padding:8px 12px;flex-wrap:wrap;gap:6px}
+  .tb-bar{display:none}
+  .tb-title{font-size:13px;width:100%;order:-1}
+  .tb-stat{font-size:10px}
+  /* Métricas: 2 columnas */
+  .mrow{grid-template-columns:1fr 1fr!important;gap:10px}
+  .mc{padding:12px 13px}
+  .mv{font-size:20px}
+  /* Charts: 1 columna */
+  .crow{grid-template-columns:1fr!important;gap:12px}
+  /* Tabla: ocultar columnas secundarias */
+  .hide-mobile{display:none!important}
+  td,th{padding:8px 8px!important;font-size:11px!important}
+  .badge{font-size:9px;padding:2px 6px}
+  /* Content padding */
+  #content{padding:12px}
+  /* Modal full width */
+  .modal{width:95vw}
+  /* Chat full screen */
+  #chat{width:100%;position:fixed;inset:0;z-index:500;display:flex;flex-direction:column}
+  #chat.hidden{display:none}
+}
+@media(min-width:769px){
+  .nav-mobile-wrap{display:contents}
+  .sys-mobile{display:none}
+}
 </style>
 </head>
 <body>
@@ -179,7 +231,7 @@ td.mono{font-family:monospace;font-size:11px}
     <div class="logo-sub">Dirección de Obras Públicas</div>
     <div class="logo-tag">PAC 2026</div>
   </div>
-  <div class="ns">Módulos</div>
+  <div class="nav-mobile-wrap">
   <div class="ni on" id="n-resumen" onclick="showView('resumen')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     Resumen General
@@ -197,11 +249,16 @@ td.mono{font-family:monospace;font-size:11px}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
     Reporte
   </div>
+  <div class="ni" id="n-obras" onclick="showView('obras')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20M4 20V10l8-6 8 6v10"/><path d="M10 20v-6h4v6"/></svg>
+    Obras en Ejecución
+  </div>
   <div class="ni" id="n-cargar" onclick="showView('cargar')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
     Cargar PAC
   </div>
-  <div class="ns">Sistema</div>
+  </div><!-- end nav-mobile-wrap -->
+  <div class="sys-mobile">
   <div class="ni" onclick="syncEdoc()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
     Sincronizar e-DOC
@@ -210,6 +267,7 @@ td.mono{font-family:monospace;font-size:11px}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     Exportar Excel
   </div>
+  </div><!-- end sys-mobile -->
   <div class="sb-bottom">
     <div class="aklabel">Claude API Key</div>
     <input class="akinput" type="password" id="api-key" placeholder="sk-ant-..." oninput="localStorage.setItem('pac_apikey',this.value)">
@@ -266,10 +324,11 @@ td.mono{font-family:monospace;font-size:11px}
               <th style="width:80px" onclick="sb2('tipo')">Tipo</th>
               <th onclick="sb2('descripcion')">Descripción</th>
               <th style="width:105px;text-align:right" onclick="sb2('monto')">Monto</th>
-              <th style="width:110px" onclick="sb2('fase')">Procedimiento</th>
-              <th style="width:95px" onclick="sb2('fecha_planificada')">Cuatrimestre</th>
-              <th style="width:55px">Hoja</th>
+              <th style="width:110px" class="hide-mobile" onclick="sb2('fase')">Procedimiento</th>
+              <th style="width:95px" class="hide-mobile" onclick="sb2('fecha_planificada')">Cuatrimestre</th>
+              <th style="width:55px" class="hide-mobile">Hoja</th>
               <th style="width:165px">Vínculo e-DOC</th>
+              <th style="width:130px" class="hide-mobile">N° SERCOP</th>
               <th style="width:130px">Estado e-DOC</th>
             </tr></thead>
             <tbody id="ptbody"></tbody>
@@ -300,6 +359,58 @@ td.mono{font-family:monospace;font-size:11px}
         </div>
         <div id="rbody" style="padding:20px"></div>
       </div>
+    </div>
+
+    <!-- OBRAS -->
+    <div class="view" id="view-obras">
+      <div class="panel">
+        <div class="ph">
+          <div class="ptitle">Tramitología — Obras en Ejecución</div>
+          <div class="tcontrols">
+            <input class="sb" type="text" id="osearch" placeholder="Buscar obra, responsable..." oninput="fobras()">
+            <select class="flt" id="oestad" onchange="fobras()">
+              <option value="">Todos los estados</option>
+              <option>EN EJECUCIÓN</option>
+              <option>SIN INICIO</option>
+              <option>INICIO DE OBRA</option>
+              <option>RECEPCIÓN PROVISIONAL</option>
+              <option>EN LIQUIDACIÓN</option>
+              <option>EJECUTADA</option>
+              <option>SUSPENDIDA</option>
+              <option>PREPARATORIA</option>
+              <option>PRECONTRACTUAL</option>
+              <option>EN CONSULTORÍA</option>
+            </select>
+            <select class="flt" id="oresp" onchange="fobras()">
+              <option value="">Todos los responsables</option>
+            </select>
+          </div>
+        </div>
+        <div class="twrap">
+          <table>
+            <thead><tr>
+              <th style="width:32px">#</th>
+              <th style="width:120px">Responsable</th>
+              <th>Descripción</th>
+              <th style="width:80px">Trámite</th>
+              <th style="width:110px">Estado</th>
+              <th style="width:100px">Avance Técnico</th>
+              <th style="width:100px" class="hide-mobile">Avance Financiero</th>
+              <th style="width:80px" class="hide-mobile">Plazo</th>
+              <th style="width:90px" class="hide-mobile">F. Inicio</th>
+              <th style="width:32px">🔗</th>
+            </tr></thead>
+            <tbody id="obras-tbody"></tbody>
+          </table>
+        </div>
+        <div class="pag">
+          <button class="pb" id="oprev" onclick="ocp(-1)">← Anterior</button>
+          <div class="pi" id="opinfo">—</div>
+          <button class="pb" id="onext" onclick="ocp(1)">Siguiente →</button>
+        </div>
+      </div>
+      <!-- Detalle obra -->
+      <div id="obra-detalle" style="display:none"></div>
     </div>
 
     <!-- CARGAR -->
@@ -361,6 +472,8 @@ td.mono{font-family:monospace;font-size:11px}
       <div class="mdesc" id="mdesc">—</div>
       <label class="fl">N° Trámite e-DOC</label>
       <input class="fi" id="mtramite" type="text" placeholder="Ej: 1176741">
+      <label class="fl">N° Proceso SERCOP</label>
+      <input class="fi" id="msercop" type="text" placeholder="Ej: SIE-GADMR-2026-001">
       <label class="fl">Estado del proceso</label>
       <select class="fi" id="mestado" style="cursor:pointer">
         <option>Sin iniciar</option><option>En proceso</option><option>Publicado SERCOP</option>
@@ -370,8 +483,20 @@ td.mono{font-family:monospace;font-size:11px}
       <label class="fl">Fase actual</label>
       <input class="fi" id="mfase" type="text" placeholder="Ej: Preparación, Precontractual...">
     </div>
+    <!-- Historial e-DOC -->
+    <div id="modal-historial" style="display:none;margin:0 20px 4px;border-top:1px solid var(--border);padding-top:14px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <span>Historial e-DOC</span>
+        <span id="hist-badge" style="background:var(--azul);color:#fff;font-size:9px;padding:1px 7px;border-radius:10px"></span>
+      </div>
+      <div id="hist-movimientos" style="max-height:200px;overflow-y:auto"></div>
+    </div>
     <div class="mf">
       <button class="btn" onclick="cm()">Cancelar</button>
+      <button class="btn" id="btn-historial" onclick="cargarHistorial()" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Ver historial
+      </button>
       <button class="btn pri" onclick="sl()">Guardar vínculo</button>
     </div>
   </div>
@@ -382,8 +507,20 @@ td.mono{font-family:monospace;font-size:11px}
 // ── DATOS INCRUSTADOS ────────────────────────────────────────────────────────
 const D0 = [{"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DEL COLECTOR NORORIENTAL (ALCANTARILLADO PLUVIAL) Y PLANTA DE TRATAMIENTO DE AGUAS RESIDUALES , SECTOR NORORIENTAL DEL CANTÓN RIOBAMBA, PROVINCIA DE CHIMBORAZO", "tipo": "OBRAS", "monto": 6900000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.03", "cpc": "542510012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1000}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE INSUMOS AGRÍCOLAS Y JARDINERÍA PARA EL MANTENIMIENTO DE ÁREAS VERDES DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 48081.7, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.15.15", "cpc": "015100911", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1001}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE MANTENIMIENTO PAISAJÍSTICO Y AGRONÓMICO DE PARQUES, PARTERRES Y ÁREAS VERDES DEL CANTÓN RIOBAMBA.", "tipo": "SERVICIO", "monto": 169473.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.04.18", "cpc": "964210113", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1002}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCIÓN DE OBRAS DE MEJORAMIENTO DE INFRAESTRUCTURA  EN VARIOS SECTORES DEL CANTÓN RIOBAMBA", "tipo": "OBRAS", "monto": 457392.88, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "541220013", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1003}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE MANTENIMIENTO VÍAL PARA DIFERENTES CALLES URBANAS Y RURALES DEL CANTÓN RIOBAMBA", "tipo": "OBRAS", "monto": 288274.57, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "545600014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1004}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE TUBERÍA PARA OBRAS DE INFRAESTRUCTURA EN DIFERENTES SECTORES DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 200000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "363201021", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1005}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISIÓN DE TAPAS Y REJILLAS DE ALCANTARILLADO PARA LA CIUDAD DE RIOBAMBA", "tipo": "BIEN", "monto": 70000.0, "estado": "Sin iniciar", "fase": "CATALOGO ELECTRONICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "363201031", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1006}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE  ALQUILER DE MAQUINARIA PESADA Y EQUIPO CAMINERO PARA EJECUCIÓN DE OBRAS Y MANTENIMIENTO VIAL EN DIFERENTES SECTORES DEL CANTÓN RIOBAMBA", "tipo": "SERVICIO", "monto": 53085.32, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.05.04", "cpc": "548000014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1007}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE EQUIPOS, HERRAMIENTAS Y ACCESORIOS PARA EL FORTALECIMIENTO OPERATIVO DE LA DIRECCIÓN DE GESTIÓN DE OBRAS PÚBLICAS Y PARROQUIAS RURALES", "tipo": "BIEN", "monto": 65000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "", "cpc": "", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1008}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ESTUDIOS ESPECIALIZADOS PARA LA CONSTRUCCIÓN DE LA CASA DEL ADOLESCENTE", "tipo": "CONSULTORIA", "monto": 90742.96, "estado": "Sin iniciar", "fase": "CONCURSO PUBLICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.06.01", "cpc": "839900011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1009}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DE BATERIA SANITARIA EN YARUQUIES E ILUMINACIÓN EN LOS PARQUES DE (YARUQUIES Y LA MADRE) DEL CANTÓN RIOBAMBA", "tipo": "OBRAS", "monto": 72000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.04", "cpc": "542700214", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1010}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCIÓN DE LA CONSTRUCCIÓN DE ESPACIOS URBANOS CÍVICO–CULTURALES EN EL CANTÓN RIOBAMBA", "tipo": "OBRAS", "monto": 135000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.04", "cpc": "542700214", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1011}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DEL BOULEVARD DE LAS ANIMAS ETAPA I", "tipo": "OBRAS", "monto": 260000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.07", "cpc": "541210014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1012}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DE BÓVEDAS EN EL CEMENTERIO GENERAL DE RIOBAMBA FASE II", "tipo": "OBRAS", "monto": 150000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.07", "cpc": "532900011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1013}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "REHABILITACIÓN URBANA DE  LA CALLE VELOZ ENTRE LAS CALLES 5 DE JUNIO Y PEDRO DE ALVARADO", "tipo": "OBRAS", "monto": 619802.4, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre I", "partida": "75.01.05", "cpc": "542100018", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1014}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "REHABILITACIÓN  LA CALLE 10 DE AGOSTO Y LAS CALLES ADYACENTES DEL CENTRO HISTÓRICO DE LA CIUDAD DE RIOBAMBA, ETAPA I", "tipo": "OBRAS", "monto": 1112319.96, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre I", "partida": "75.01.05", "cpc": "542100018", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1015}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "AMPLIACIÓN DEL PUENTE DE INGRESO A LOS BARRIOS LA VICTORIA Y SAN JOSE DE CHIBUNGA", "tipo": "OBRAS", "monto": 150000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100018", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1016}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE EQUIPO CAMINERO PARA EL FORTALECIMIENTO OPERATIVO DE LA DIRECCIÓN DE OBRAS PÚBLICAS DEL GADM RIOBAMBA", "tipo": "BIEN", "monto": 928300.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.05", "cpc": "492100011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1017}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE MANTENIMIENTO DE VIGENCIA TECNOLOGICA VOLQUETAS", "tipo": "SERVICIO", "monto": 33000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.04.05", "cpc": "547900411", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1018}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "FISCALIZACIÓN E INSPECCIONES TÉCNICAS PROYECTOS", "tipo": "CONSULTORIA", "monto": 238740.0, "estado": "Sin iniciar", "fase": "CONCURSO PUBLICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.06.04", "cpc": "839900111", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1019}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE DIFUSION, INFORMACION Y PUBLICIDAD, OBRA PUBLICA", "tipo": "SERVICIO", "monto": 26295.54, "estado": "Sin iniciar", "fase": "COMUNICACION SOCIAL CONTRATACION DIRECTA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.02.07", "cpc": "836200014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1020}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EDICION IMPRESIÓN, REPRODUCCION, PUBLICACIONES OBRA PUBLICA", "tipo": "SERVICIO", "monto": 11000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.02.04", "cpc": "891211011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1021}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EXPROPIACIÓN DE VARIOS PREDIOS", "tipo": "BIEN", "monto": 635719.86, "estado": "Sin iniciar", "fase": "ADQUISICION DE BIENES INMUEBLES", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.03.01", "cpc": "722300012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1022}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DEL CERRAMIENTO EN EL PREDIO LA MATILDE Y\nADECENTAMIENTO DE SUS ESPACIOS EXTERIORES", "tipo": "OBRAS", "monto": 240000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.07", "cpc": "541210014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1023}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "READECUACIÓN DE LA INFRAESTRUCTURA FÍSICA DEL CENTRO DE PRIVACIÓN DE LIBERTAD DE CHIMBORAZO Nro. 1", "tipo": "OBRAS", "monto": 67000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "541210014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1024}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ESTUDIO DE SUELOS SPT PARA DIFERENTES PROYECTOS DE INFRAESTRUCTURA DE LA CIUDAD DE RIOBAMBA", "tipo": "CONSULTORIA", "monto": 30000.0, "estado": "Sin iniciar", "fase": "CONCURSO PUBLICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.06.01", "cpc": "835100012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1025}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN, INSTALACIÓN Y PUESTA EN MARCHA DE GENERADORES ELÉCTRICOS PARA EL GOBIERNO AUTÓNOMO DESCENTRALIZADO MUNICIPAL DEL CANTÓN RIOBAMBA.", "tipo": "BIEN", "monto": 111700.44, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "461130015", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1026}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISIÓN DE MATERIALES PETREOS ENTREGADOS EN MINA PARA VARIAS OBRAS DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 110000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "153200015", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1027}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE MATERIALES PÉTREOS, ENTREGADOS EN MINA, PARA EL MANTENIMIENTO VIAL EN DIFERENTES SECTORES RURALES DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 428044.28, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "153200015", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1028}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE ADOQUINES PARA EL MEJORAMIENTO DE VÍAS EN DIFERENTES SECTORES URBANOS Y RURALES DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 1564577.59, "estado": "Sin iniciar", "fase": "CATALOGO ELECTRONICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "373700019", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1029}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE CEMENTO PARA EL MEJORAMIENTO VIAL EN DIFERENTES SECTORES URBANOS Y RURALES DEL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 445792.33, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "374400011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1030}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE MAQUINARIA PARA EL CANTÓN RIOBAMBA", "tipo": "BIEN", "monto": 1214876.31, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "444210111", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1031}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE MANTENIMIENTO DE EQUIPO CAMINERO DE CANTÓN RIOBAMBA", "tipo": "SERVICIO", "monto": 50000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.04.05", "cpc": "547900411", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1032}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE MATERIALES (TUBERIA) PARA LA CONSTRUCCIÓN DEL SISTEMA DE AGUA POTABLE Y ALCANTARILLADO  DE LA CABECERA PARROQUIAL SAN JUAN FASE", "tipo": "BIEN", "monto": 619819.4, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre I", "partida": "73.08.11", "cpc": "532410011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1033}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EXPROPIACIÓN DEL PREDIO DE LA CABECERA PARROQUIAL DE SAN JUAN", "tipo": "BIEN", "monto": 70000.0, "estado": "Sin iniciar", "fase": "ADQUISICION DE BIENES INMUEBLES", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.03.01", "cpc": "722300012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1034}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ESTUDIOS PARA LA CONSTRUCCION DEL SISTEMA DE AGUA POTABLE Y ALCANTARILLADO DE LA COMUNIDAD BAYUBUG DE LA PARROQUIA CALPI", "tipo": "CONSULTORIA", "monto": 55000.0, "estado": "Sin iniciar", "fase": "CONCURSO PUBLICO", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.06.01", "cpc": "839900011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1035}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCCIÓN DE ADOQUINADO DE VÍAS EN LA CABECERA PARROQUIAL DE PUNGALÁ", "tipo": "OBRAS", "monto": 140000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1036}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCCIÓN DEL ADOQUINADO DE PURUHUAYPAMBA DE LA PARROQUIA PUNGALA", "tipo": "OBRAS", "monto": 66000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1037}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCCIÓN DE ADOQUINADO DE VARIAS VÍAS DE LA CABECERA PARROQUIAL DE LICTO", "tipo": "OBRAS", "monto": 77719.1, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1038}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "READECUACIÓN DEL CEMENTERIO DE LA CABECERA PARROQUIAL DE LICAN", "tipo": "OBRAS", "monto": 31000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "541210014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1039}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "MANTENIMIENTO Y REHBALITACIÓN VIAL DE LAS COMUNIDADES DE LA PARROQUIA CUBIJÍES", "tipo": "OBRAS", "monto": 209954.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100018", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1040}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "READECUACIÓN DEL COLISEO DE LA PARROQUIA CUBIJIES", "tipo": "OBRAS", "monto": 120000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "541210014", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1041}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EXPROPIACIÓN DEL TERRENO PARA AMPLIACIÓN DEL CEMENTERIO DE LA PARROQUIA QUIMIAG", "tipo": "BIEN", "monto": 100000.0, "estado": "Sin iniciar", "fase": "ADQUISICION DE BIENES INMUEBLES", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.03.01", "cpc": "722300012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1042}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCIÓN DE LA CONSTRUCCIÓN DE LA CUBIERTA METÁLICA DE LA CANCHA DE LA COMUNIDAD SHILPALA, PARROQUIA CACHA", "tipo": "OBRAS", "monto": 80000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.04", "cpc": "544000114", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1043}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCCIÓN  DE CENTRO TURISTICO DE SAN MIGUEL DE QUERA FASE I PARROQUIA CACHA", "tipo": "OBRAS", "monto": 79901.46, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.07", "cpc": "541210012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1044}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ASFALTADO DE VÍAS PARA LAS COMUNIDADES CACHA, PUCARAQUINCHE - CACHA HUAGSHI", "tipo": "OBRAS", "monto": 631706.67, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "542100018", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1045}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCIÓN DE LA CONSTRUCCIÓN DE CUBIERTAS PARA LA CANCHA DE USO MÚLTIPLE DE LA COMUNIDAD SAN VICENTE Y EL GRADERÍO DE LA COMUNIDAD CACHIGUAYCO, PARROQUIA PUNÍN", "tipo": "OBRAS", "monto": 102999.7, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.04", "cpc": "544000114", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1046}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DE BATERIAS SANITARIAS Y VESTIDORES DE LA COMUNIDAD DE SAN JUAN DE PALLO , PARROQUIA PUNIN", "tipo": "OBRAS", "monto": 72000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.04", "cpc": "541210012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1047}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "MEJORAMIENTO DES ESPACIOS RECREATIVOS DE COMUNIDADES DE LA PARROQUIA PUNÍN", "tipo": "OBRAS", "monto": 28823.7, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "542700215", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1048}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICION DE MATERIALES PARA LA TERMINACION DEL CENTRO DE CONVENCIONES DE LA COMUNIDAD MIRALOMA, PARROQUIA PUNIN.", "tipo": "BIEN", "monto": 41000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.08.11", "cpc": "624650012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1049}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "CONSTRUCCIÓN DE BORDILLOS EN LA COMUNIDAD SAN ISIDRO DE PUNÍN", "tipo": "OBRAS", "monto": 62302.56, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.01.05", "cpc": "532900011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1050}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "MANTENIMIENTO Y REHABILITACION DE LA IGLESIA PATRIMONIAL DEL SANTO CRISTO DE LA PARROQUIA FLORES", "tipo": "OBRAS", "monto": 80000.0, "estado": "Sin iniciar", "fase": "LICITACIÓN", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre III", "partida": "75.05.01", "cpc": "541210031", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1051}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE CAMARAS DE SEGURIDAD Y VIGILANCIA PARA LA PARROQUIA FLORES", "tipo": "BIEN", "monto": 20000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "732900012", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "PAC2026", "_id": 1052}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE UN TRACTOR CORTA CÉSPED Y DE UNA MOTOGUADAÑA PARA LA PARROQUIA PUNÍN", "tipo": "BIEN", "monto": 10000.0, "estado": "Sin iniciar", "fase": "INFÍMA CUANTÍA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "441200011", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1053}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE BOMBA DE AGUA PARA LA COMUNIDAD AMBUG, PARROQUIA PUNÍN", "tipo": "BIEN", "monto": 15000.0, "estado": "Sin iniciar", "fase": "INFÍMA CUANTÍA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "432200112", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1054}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "EJECUCIÓN DE LA CONSTRUCCIÓN DEL SISTEMA DE DRENAJE DEL ESTADIO DE LA CABECERA PARROQUIALDE FLORES", "tipo": "OBRAS", "monto": 10000.0, "estado": "Sin iniciar", "fase": "INFÍMA CUANTÍA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "75.05.01", "cpc": "542700214", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1055}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "SERVICIO DE MANTENIMIENTO DEL EDIFICIO Y COLISEO DEL GAD PARROQUIAL FLORES", "tipo": "SERVICIO", "monto": 10000.0, "estado": "Sin iniciar", "fase": "INFÍMA CUANTÍA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "73.04.17", "cpc": "541210015", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1056}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "ADQUISICIÓN DE CONCRETERA, FORMALETAS Y ENCOFRADOS PARA EL FORTALECIMIENTO DE LOS TRABAJOS DE CONSTRUCCIÓN Y MEJORAMIENTO DE INFRAESTRUCTURA EN LA PARROQUIA FLORES", "tipo": "BIEN", "monto": 10000.0, "estado": "Sin iniciar", "fase": "INFÍMA CUANTÍA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre II", "partida": "84.01.04", "cpc": "4219000110", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1057}, {"_dir": "Dirección de Obras Públicas", "num_pac": "2026", "descripcion": "LETRAS CORPÓREAS PARA LA PARROQUIA PUNIN", "tipo": "BIEN", "monto": 11000.0, "estado": "Sin iniciar", "fase": "SUBASTA INVERSA ELECTRONICA", "responsable": "Mgs. Fabián Borja Fernández", "fecha_planificada": "Cuatrimestre I", "partida": "73.02.04", "cpc": "836100021", "tramite_edoc": "", "estado_edoc": "", "fase_edoc": "", "_hoja": "INFIMAS", "_id": 1058}];
 
+// ── OBRAS EN EJECUCIÓN ───────────────────────────────────────────────────────
+const D1 = [{"_id": 2001, "responsable": "FABIAN BORJA", "tramite": "1063236", "descripcion": "ADQUISIÓN DE MATERIALES DE FERRETERÍA PARA VARIAS OBRAS DEL CANTÓN RIOBAMBA", "estado": "EN EJECUCIÓN", "plazo": "365 DIAS", "fecha_inicio": "18/03/2025", "avance_tecnico": 50, "avance_financiero": 0, "observacion": "EN TRAMITE DE PAGO DE PLANILLA 1", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=waPRQY1FK5rWGgFav8lv0-stVJLjNZMXIWvJqjiBvxU,", "lat": -1.673812, "lng": -78.638372}, {"_id": 2002, "responsable": "FABIAN BORJA", "tramite": "1062092", "descripcion": "CONSTRUCCIÓN DEL ESTADIO DE LA CABECERA PARROQUIAL DE CALPI - FASE 2", "estado": "SIN INICIO", "plazo": "90 DIAS", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "SIN INICIO DE OBRA, FALTA LA ENTREGA DE PLANOS DEFINITIVOS POR PARTE DEL PROYECTISTA Y EL DESBANQUE DEL TERRRENO POR PARTE DELA JUNTA PARROQUIAL DE CALPI", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=8dZXEzC-wO7C3KmohXvy6O9HmUeX4vvQegVXTQSmRDU,", "lat": -1.64447, "lng": -78.73679}, {"_id": 2003, "responsable": "LISSETTE MENA", "tramite": "523425", "descripcion": "OBRA READECUACION PARQUE QUINTA LA ROSITA", "estado": "EJECUTADA", "plazo": "120 DIAS", "fecha_inicio": "08/03/2023", "avance_tecnico": 100, "avance_financiero": 100, "observacion": "SIN OBSERVACIÓN", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=XMlDfa-DGTUXfHI2iGVdYCEaMHKUe1xBYAk0xNSY9q8,", "lat": -1.681559, "lng": -78.646523}, {"_id": 2004, "responsable": "LISSETTE MENA", "tramite": "948729", "descripcion": "CONSTRUCCIÓN DEL TECHO PARA LA ESCUELA VICENTE ROCAFUERTE, LICAN", "estado": "EN EJECUCIÓN", "plazo": "90 DIAS", "fecha_inicio": "10/04/2026", "avance_tecnico": 85, "avance_financiero": 0, "observacion": "A ESPERA DE LA SUSCRIPCION DE CONTRATO COMPLEMENTARIO, CON PLAZO A PUNTO DE FENECERSE FALTA INFORME DEL DELEGADO DE LA MAXIMA AUTORIDAD, PLANILLAS EN REVISIÓN", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=EXy_2GTTd-r-pC_2k69TOiJ_QIuVeP_IMVO8OVlpVMY,", "lat": -1.63001, "lng": -78.72209}, {"_id": 2005, "responsable": "LISSETTE MENA", "tramite": "536381", "descripcion": "CONSTRUCCIÓN DEL SISTEMA DE ALCANTARILLADO PARA VARIOS BARRIOS DE LA PARROQUIA DE YARUQUIES", "estado": "SUSPENDIDA", "plazo": "120 DIAS", "fecha_inicio": "01/06/2023", "avance_tecnico": 36, "avance_financiero": 36, "observacion": "FALTA DE DOCUMENTOS HABILITANTES PARA DAR INICIO DE OBRA (CONVENIO Y DECLARATORIA DE UTILIDAD PUBLICA DE VIAS)", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=IOXnS1GbBeVKFiaOmGKWhnOT_f-K9zVOvsSa6mCMYns,", "lat": -1.6892, "lng": -78.6797}, {"_id": 2006, "responsable": "MICHELLE VELASQUEZ", "tramite": "861056", "descripcion": "CONSTRUCCIÓN DEL CENTRO DE CAPACITACIÓN DE LA CABECERA PARROQUIAL DE SAN LUIS", "estado": "RECEPCIÓN PROVISIONAL", "plazo": "180 DIAS", "fecha_inicio": "15/08/2025", "avance_tecnico": 100, "avance_financiero": 100, "observacion": "EN ESPERA DE LOS 6 MESES PARA LA RECEPCIÓN DEFINITIVA.", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=fabo3hA3vcn62d-R5tNxJqghfvNagaMrObQJ7rlw25M,", "lat": -1.706517, "lng": -78.647606}, {"_id": 2007, "responsable": "MICHELLE VELASQUEZ", "tramite": "687140", "descripcion": "READECUACIÓN DEL CEMENTERIO COMUNIDAD SHANAICUN DE LA PARROQUIA PUNGALÁ", "estado": "RECEPCIÓN PROVISIONAL", "plazo": "90 DIAS", "fecha_inicio": "18/11/2024", "avance_tecnico": 100, "avance_financiero": 100, "observacion": "", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=DP38JaXGBVuoI0SSCMe4J6bs_Gdff8SXVyu0aq1hkYc,", "lat": -1.87336, "lng": -78.594722}, {"_id": 2008, "responsable": "MICHELLE VELASQUEZ", "tramite": "912860", "descripcion": "CONSTRUCCION DE MURO Y BOVEDAS PARA EL CEMENTERIO DE LA CABECERA PARROQUIA DE SAN JUAN", "estado": "EN LIQUIDACIÓN", "plazo": "60 DIAS", "fecha_inicio": "07/02/2026", "avance_tecnico": 100, "avance_financiero": 100, "observacion": "EL CONTRATISTA NO PRESENTA DOCUMENTACIÓN COMPLETA PARA PROCEDER AL PAGO DE PLANILLAS.", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=SZfhfKOGnN6w5bLCbBwESgu7UlSFPfCMnAaFlfysz94,", "lat": -1.63148, "lng": -78.782135}, {"_id": 2009, "responsable": "FABIAN BORJA", "tramite": "1056181", "descripcion": "CONSTRUCCIÓN DE BÓVEDAS EN EL CEMENTERIO GENERAL DE RIOBAMBA", "estado": "EN EJECUCIÓN", "plazo": "120 DIAS", "fecha_inicio": "08/04/2026", "avance_tecnico": 30, "avance_financiero": 0, "observacion": "PLANILLA 1 SE ENCUENTRA EN FINANCIERO", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=6lcCMfgKO87XQBQATU2qKrRJtr58SThdKoOdaPB4H-E,", "lat": -1.680601, "lng": -78.657101}, {"_id": 2010, "responsable": "JULIO PARRA", "tramite": "944866", "descripcion": "READECUACIÓN DEL PARQUE CENTRAL DE LA PARROQUIA QUIMIAG", "estado": "EJECUTADA", "plazo": "60", "fecha_inicio": "20/01/2026", "avance_tecnico": 100, "avance_financiero": 80, "observacion": "FALTA EL PAGO PLANILL 3 DE LIQUIDACIÓN", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=dmGBw_azRoJC2MWAixirB2gyJFJMKdVPL688pM7SNWw,", "lat": -1.658013, "lng": -78.567315}, {"_id": 2011, "responsable": "JULIO PARRA", "tramite": "554267", "descripcion": "CONSTRUCCIÓN DE UNA AULA EN EL CENTRO INFANTIL DEL MINISTERIO DEL INTERIOR “MUNDO DE ILUSIONES RIOBAMBA, CONTRATO DE MENOR CUANTÍA DE OBRA NRO. 017-2022, PROCESO NRO. MCO-GADMR-005-2022.", "estado": "EJECUTADA", "plazo": "60", "fecha_inicio": "11/10/2022", "avance_tecnico": 100, "avance_financiero": 0, "observacion": "EL CONTRATISTA NO DA RESPUESTA A LOS CONSTANTES LLAMADOS POR PARTE DE FISCAZALIZACIÓN Y ADMINISTRACIÓN./ERROR EN EL ACTA DE RECEPCIÓN PROVISIONAL", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=RMr7t-El_Q3drj3WXcnpZgaPHyLxjbs6TH5I5pmNDPg,", "lat": -1.678986, "lng": -78.638902}, {"_id": 2012, "responsable": "MAURICIO BONILLA", "tramite": "1160875", "descripcion": "PROYECTO “READECUACIÓN DEL COLISEO DE LA\n PARROQUIA CUBIJIES”", "estado": "PREPARATORIA", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "REVISION, INICIO DE PROCESO", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2013, "responsable": "MAURICIO BONILLA", "tramite": "1140677", "descripcion": "“CONSTRUCCIÓN DEL CERRAMIENTO EN EL\n PREDIO LA MATILDE Y ADECENTAMIENTO DE SUS ESPACIOS\n EXTERIORES", "estado": "PREPARATORIA", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "REVISION, TRAMITE DEVUELTO", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2014, "responsable": "MAURICIO BONILLA", "tramite": "1169501", "descripcion": "READECUACION DEL CEMENTERIO DE LA CABECERA PARROQUIAL DE LICAN”", "estado": "PREPARATORIA", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "REVISION, INICIO DE PROCESO", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2015, "responsable": "MAURICIO BONILLA", "tramite": "1158314", "descripcion": "PROYECTO “ASFALTADO DE VÍAS PARA LAS\n COMUNIDADES CACHA, PUCARAQUINCHE-CACHA HUAGSHI", "estado": "PREPARATORIA", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "REVISION", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2016, "responsable": "MAURICIO BONILLA", "tramite": "1127108", "descripcion": "ADQUISICIÓN, INSTALACIÓN Y PUESTA EN MARCHA DE\n GENERADORES ELÉCTRICOS PARA EL GOBIERNO AUTÓNOMO DESCENTRALIZADO\n MUNICIPAL DEL CANTÓN RIOBAMBA", "estado": "PRECONTRACTUAL", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "REVISION", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2017, "responsable": "MARIO GUAMAN", "tramite": "1070230", "descripcion": "ADMINISTRADOR DE CONTRATO: PROCESO SIE-GADMR-2025-068 - “ADQUISICIÓN DE CEMENTO PARA EL ALCANTARILLADO SANITARIO PARA LA COMUNIDAD CUNCUN CACHIPATA”.", "estado": "EN EJECUCUIN", "plazo": "30 DIAS", "fecha_inicio": "", "avance_tecnico": 100, "avance_financiero": 0, "observacion": "SUBSANANDO OBSERVACIONES PARA PAGO", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2018, "responsable": "MARIO GUAMAN", "tramite": "1070852", "descripcion": "ADMINISTRADOR DE ORDEN DE COMPRA: “ADQUISIÓN DE TAPAS DE ALCANTARILLADO PARA LA CIUDAD DE RIOBAMBA”", "estado": "EN EJECUCIÓN", "plazo": "30 DIAS", "fecha_inicio": "", "avance_tecnico": 100, "avance_financiero": 0, "observacion": "SE ENVIÓ A PAGO", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2019, "responsable": "FABIAN BORJA", "tramite": "829080", "descripcion": "FISCALIZADOR: PROYECTO “CONSTRUCCIÓN DEL ALCANTARILLADO DE LA COMUNIDAD SAN MARTIN DE VERANILLO ETAPA 1 – TRAMO DE INTERES”", "estado": "EN EJECUCIÓN", "plazo": "60 DIAS", "fecha_inicio": "", "avance_tecnico": 70, "avance_financiero": 50, "observacion": "FALTA DE SUSPENSION DE OBRA", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2020, "responsable": "LUIS BENÍTEZ", "tramite": "1167949", "descripcion": "\"READECUACIÓN DE LA PISCINA DE LA CABECERA PARROQUIAL DE CUBIJÍES\"", "estado": "SIN ESTADO", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2021, "responsable": "ELVYS TIPÁN", "tramite": "776697", "descripcion": "“REGENERACIÓN URBANA DE LA AV. CARLOS ZAMBRANO Y PREDIOS ALEDAÑOS AL ESTADIO OLÍMPICO DE RIOBAMBA”", "estado": "EN EJECUCIÓN", "plazo": "120 DIAS", "fecha_inicio": "", "avance_tecnico": 80, "avance_financiero": 60, "observacion": "FUERA DE PLAZO", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2022, "responsable": "FABIAN BORJA", "tramite": "1155418", "descripcion": "READECUACIÓN DEL MERCADO GENERAL JUAN BERNARDO DAVALOS", "estado": "EN EJECUCIÓN", "plazo": "180 DIAS", "fecha_inicio": "08/06/2026", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "SE SUSPENDIO Y SE DA REINICIO EL 8 DE JUNIO DEL 2026", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2023, "responsable": "LUIS MANCERO", "tramite": "979053", "descripcion": "ADQUISICIÓN DE EQUIPO TOPOGRÁFICO PARA LA DIRECCIÓN DE GESTIÓN DE OBRAS PÚBLICAS", "estado": "EN EJECUCIÓN", "plazo": "45 DIAS", "fecha_inicio": "23/12/2025", "avance_tecnico": 100, "avance_financiero": 100, "observacion": "SE HA SOLICITADO EL CIERRE DEL PROCESO UNA VEZ SE CUENTA CON LA INFORMACIÓN COMPLETA EN EL PORTAL A COMPRAS PÚBLICAS", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=Nymw8GhS5pnRRrsiRvFBMp1l24B7TGFHSBtdI1TSxyg,", "lat": null, "lng": null}, {"_id": 2024, "responsable": "LORENA CARRIÓN ERAZO", "tramite": "1073895", "descripcion": "CONTRATO DEL PROYECTO: CONSTRUCCIÓN DE CERRAMIENTO FRONTAL Y CUERPOS DE BÓVEDAS EN EL CEMENTERIO DE LA CABECERA PARROQUIAL DE FLORES", "estado": "EN EJECUCIÓN", "plazo": "120", "fecha_inicio": "20/05/2026", "avance_tecnico": 11, "avance_financiero": 0, "observacion": "EN EJECUCIÓN", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=ZsGXbuRYZg6dy0OBZYaDNUp4EA1uTMDFNj-_NCWL15E,", "lat": -1.817597, "lng": -78.64596}, {"_id": 2025, "responsable": "LORENA CARRIÓN ERAZO", "tramite": "1062815", "descripcion": "CONTRATO DEL PROYECTO: CONSTRUCCION DE BÓVEDAS PARA EL CEMENTERIO DE LA CABECERA PARROQUIAL DE SAN LUIS", "estado": "EN EJECUCIÓN", "plazo": "90", "fecha_inicio": "13/05/2026", "avance_tecnico": 20, "avance_financiero": 0, "observacion": "EN EJECUCIÓN", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=FkMlhLD75wTwckw6VMVyS9rt1OTJvreaDvDeChDjLrw,", "lat": -1.708106, "lng": -78.648107}, {"_id": 2026, "responsable": "MONICA PALTAN", "tramite": "877574", "descripcion": "CONSTRUCCION DEL CENTRO DE CAPACITACION DE LA CABECERA PARROQUIAL DE PUNGALÁ", "estado": "EN EJECUCIÓN", "plazo": "120 DÍAS", "fecha_inicio": "07/02/2026", "avance_tecnico": 92, "avance_financiero": 28, "observacion": "REVISIÓN DE LA PLANILLA 2", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=T8eNiwRoSEOQyMw0kRhNpnh0WjVcSDFgU1s7nPnMj7A,", "lat": null, "lng": null}, {"_id": 2027, "responsable": "LUCÍA PAUCAR", "tramite": "693745", "descripcion": "DESIGNACIÓN DE ADMINISTRADOR DE CONTRATO DE LA OBRA DENOMINADA \"BACHEO DE VARIAS VÍAS DE LA CIUDAD DE RIOBAMBA\"", "estado": "RECEOCIÓN PROVISIONAL", "plazo": "120 DIAS", "fecha_inicio": "15/05/2024", "avance_tecnico": 100, "avance_financiero": 0, "observacion": "CON FECHA 28 DE ENERO DE 2026 SE SUSCRIBE EL ACTA PROVISIONAL.", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=PDZBPOpgwOlOe2LNzv4_TX-L5g_w2i_Pj3fspDzc_p0,", "lat": null, "lng": null}, {"_id": 2028, "responsable": "MONICA PALTAN", "tramite": "960305", "descripcion": "ESTUDIOS CONTRATACIÓN DE UNA CONSULTORÍA PARA LOS ESTUDIOS DE EVALUACIÓN, DIAGNÓSTICO Y DISEÑOS DEFINITIVOS DEL SISTEMA DE ALCANTARILLADO SANITARIO Y UNIDADES BÁSICAS SANITARIAS DE LA COMUNIDAD SAN JOSÉ DE GAUSHI, PARROQUIA CALPI, CANTÓN RIOBAMBA, PROVINCIA DE CHIMBORAZO", "estado": "EN EJECUCIÓN", "plazo": "180 DÍAS", "fecha_inicio": "23/12/2025", "avance_tecnico": 50, "avance_financiero": 50, "observacion": "A LA ESPERA DEL INGRESO DE LA FASE 2 POR PARTE DEL CONSULTOR", "link_sercop": "https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idSoliCompra=eu2pu4KyPay4ah2i70pQBWVYSfM6cdmPTviwUhvtC50,", "lat": null, "lng": null}, {"_id": 2029, "responsable": "JAIME PADILLA", "tramite": "689324", "descripcion": "ADMINISTRADOR DE CONTRATO: “CONSTRUCCIÓN DE UNIDADES BÁSICAS SANITARIAS PARA LAS COMUNIDADES DE PUESETUS CHICO, EL OBRAJE DE LA PARROQUIA FLORES, Y DAL DAL DE LA PARROQUIA PUNGALA CANTÓN RIOBAMBA PROVINCIA DE CHIMBORAZO”", "estado": "SIN ESTADO", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "SUSPENDIDO HASTA LE ESPERA DEL CONTRATO COMPLEMENTARIO TAMITE CON WASHINGTON LIZARDO PILCO CASTILLO (26 DIAS)", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2030, "responsable": "JAIME PADILLA", "tramite": "828756", "descripcion": "CONSTRUCCIÓN DEL CERRAMIENTO DEL ESTADIO COMUNIDAD ALAO LLACTAPAMBA, PARROQUIA PUNGALÁ", "estado": "SIN ESTADO", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "RECEPCION PROVISIONAL", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2031, "responsable": "JAIME PADILLA", "tramite": "857028", "descripcion": "CONSTRUCCIÓN DE LA PLAZA DE RASTRO DE LA PARROQUIA LICTO, ETAPA 1", "estado": "SIN ESTADO", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "RECEPCION PROVISIONAL", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2032, "responsable": "JAIME PADILLA", "tramite": "774884", "descripcion": "MEJORAMIENTO DE LA CONDUCCIÓN E IMPLEMENTACIÓN DEL TANQUE DE RESERVA DEL SISTEMA DE AGUA POTABLE DE LA CABECERA PARROQUIAL DE SAN LUIS CANTÓN RIOBAMBA, PROVINCIA DE CHIMBORAZO", "estado": "SIN ESTADO", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "EN PROCESO DE INICIO DE OBRA", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2033, "responsable": "JAIME PADILLA", "tramite": "960215", "descripcion": "EJECUCIÓN DEL SISTEMA DE AGUA POTABLE PARA LA JUNTA DE AGUA POTABLE DE TZALARON Y LA JUNTA DE AGUA POTABLE YANACOCHA DE LA PARROQUIA PUNIN, CANTÓN RIOBAMBA, PROVINCIA DE CHIMBORAZO", "estado": "SIN ESTADO", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "PROCESO DE LIQUIDACION", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2034, "responsable": "JAIME PADILLA", "tramite": "1065662", "descripcion": "ADMINISTRADOR DE CONTRATO: ADQUISICION DE ADOQUINES PARA VIAS DE VARIAS COMUNIDADES DE LA PARROQUIA DE CUBIJIES", "estado": "SIN ESTADO", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "A LA ESPERA DEL TRANSPORTE POR PARTE DEL ING. FABIAN BORJA EN CALIDAD DE DIRECTOR GENERAL DE OBRAS PUBLICAS PARA PODER ENTREGAR LOS ADOQUINES Y LIQUIDAR.", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2035, "responsable": "JAIME PADILLA", "tramite": "1073354", "descripcion": "ADMINISTRADOR DE CONTRATO: ADQUISICIÓN DE ADOQUINES PARA LA CABECERA PARROQUIAL DE SAN LUIS", "estado": "SIN ESTADO", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "EN PROCESO DE LIQUIDACION", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2036, "responsable": "JAIME PADILLA", "tramite": "968207", "descripcion": "ADMINISTRADOR DE CONTRATO: PROVISION E INSTALACION DE LA PLANTA DE TRATAMIENTO DEL SISTEMA DE ALCANTARILLADO SANITARIO DE LA CABECERA PARROQUIAL DE CALPI", "estado": "SIN ESTADO", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "EN PROCESO DE LIQUIDACION, A LA ESPERA DEL REPLANTEO PARA LA COLOCACION DE LOS BIODIGESTORES POR PARTE DEL TOP. PATRICIO GARCIA.", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2037, "responsable": "ANDRÉS CASTILLO", "tramite": "1126537", "descripcion": "“CONSTRUCCIÓN DE MÓDULOS ARTESANALES EN LA PARROQUIA YARUQUÍES”", "estado": "SUSPENDIDA", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "OBRA SUSPENDIDA DESDE 04/05/2026", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2038, "responsable": "ANDRÉS CASTILLO", "tramite": "1061845", "descripcion": "“REACONDICIONAMIENTO DEL ESTADIO DE LA COMUNIDAD BASHALAN DE LA PARROQUIA PUNÍN \"", "estado": "INICIO DE OBRA", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2039, "responsable": "ANDRÉS CASTILLO", "tramite": "1073890", "descripcion": "“READECUACIÓN DE LA PISCINA DE LA CABECERA PARROQUIAL DE CUBIJÍES”", "estado": "INICIO DE OBRA", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2040, "responsable": "ANDRÉS CASTILLO", "tramite": "1058316", "descripcion": "“READECUACIÓN DEL MERCADO GENERAL JUAN BERNARDO DAVALOS”", "estado": "SUSPENDIDA", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2041, "responsable": "ANDRÉS CASTILLO", "tramite": "1063648", "descripcion": "“MEJORAMIENTO DE LA INFRAESTRUCTURA BÁSICA DE USO PÚBLICO-COLISEO DEL GAD PARROQUIAL DE PUNÍN”", "estado": "INICIO DE OBRA", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2042, "responsable": "ANDRÉS CASTILLO", "tramite": "1064670", "descripcion": "CERRAMIENTO Y GRADERÍO DEL ESTADIO COMUNIDAD BAYUSHI SAN VICENTE, PARROQUIA CALPI", "estado": "EN EJECUCIÓN", "plazo": "", "fecha_inicio": "", "avance_tecnico": 20, "avance_financiero": 0, "observacion": "", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2043, "responsable": "JONATHAN SANTILLAN", "tramite": "1080186", "descripcion": "DESIGNACIÓN DE FISCALIZACIÓN DE OBRA “CONSTRUCCION DE UNA BATERIA SANITARIA EN LA COMUNIDAD DE TAMBO GUASHA, PARROQUIA SAN JUAN”", "estado": "SIN INICIO", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "ADMINISTRADOR DE CONTRATO", "link_sercop": "LICO-GADMR-2025-017", "lat": null, "lng": null}, {"_id": 2044, "responsable": "JONATHAN SANTILLAN", "tramite": "1063592", "descripcion": "CONSTRUCCIÓN DE UNA BATERÍA EN EL ESTADIO DE LA CABECERA PARROQUIAL DE CUBIJÍES”, CONTRATO DE LICITACIÓN DE OBRAS NO. 005-2026, CORRESPONDIENTE AL PROCESO NO. LICO-GADMR-2025-020.", "estado": "EN EJECUCIÓN", "plazo": "", "fecha_inicio": "20 DE ABRI", "avance_tecnico": 40, "avance_financiero": 0, "observacion": "ADMINISTRADOR DE CONTRATO", "link_sercop": "LICO-GADMR-2025-020", "lat": null, "lng": null}, {"_id": 2045, "responsable": "JONATHAN SANTILLAN", "tramite": "1069853", "descripcion": "IMPLEMENTACION DE JUEGOS INFANTILES Y GIMNASIOS AL AIRE LIBRE PARA LAS PARROQUIAS RURALES DEL CANTON RIOBAMBA”, CONTRATO DE LICITACIÓN DE OBRAS NO. 020-2026, CORRESPONDIENTE AL PROCESO NO. LICO-GADMR-2025-025", "estado": "EN EJECUCIÓN", "plazo": "30 DIAS", "fecha_inicio": "01 DE JUNI", "avance_tecnico": 10, "avance_financiero": 0, "observacion": "ADMINISTRADOR DE CONTRATO", "link_sercop": "LICO-GADMR-2025-025", "lat": null, "lng": null}, {"_id": 2046, "responsable": "JONATHAN SANTILLAN", "tramite": "1060871", "descripcion": "CONSTRUCCIÓN DEL CERRAMIENTO LOURDES MACAJÍ ETAPA II", "estado": "EN EJECUCIÓN", "plazo": "90 DIAS", "fecha_inicio": "05 DE MAYO", "avance_tecnico": 35, "avance_financiero": 0, "observacion": "FISCALIZADOR DE OBRA", "link_sercop": "LICO-GADMR-2025-005", "lat": null, "lng": null}, {"_id": 2047, "responsable": "JONATHAN SANTILLAN", "tramite": "1067601", "descripcion": "CONSULTORIA DEL SISTEMA DE AGUA POTABLE DE LA CABECERA PARROQUIAL DE LICAN", "estado": "EN CONSULTORÍA", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "ADMINISTRADOR DE CONTRATO", "link_sercop": "CPC-GADMR-2025-001", "lat": null, "lng": null}, {"_id": 2048, "responsable": "JONATHAN SANTILLAN", "tramite": "854294", "descripcion": "REHABILITACIÓN Y REESTRUCTURACIÓN DEL MERCADO MARIANO BORJA “LA MERCED”, PROCESO NO. LICO-GADMR-2025-008", "estado": "SUSPENDIDA", "plazo": "180 DIAS", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "JEFE DE FISCALIZACIÓN", "link_sercop": "", "lat": null, "lng": null}, {"_id": 2049, "responsable": "JONATHAN SANTILLAN", "tramite": "1078469", "descripcion": "“CONSTRUCCIÓN DEL BOULEVARD TURÍSTICO DE LA CABECERA PARROQUIAL DE FLORES”", "estado": "SIN INICIO", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "FISCALIZACIÓN", "link_sercop": "LICO-GADMR-2025-019", "lat": null, "lng": null}, {"_id": 2050, "responsable": "JONATHAN SANTILLAN", "tramite": "1073348", "descripcion": "CONSTRUCCIÓN DEL CENTRO DE CAPACITACIÓN EN LA COMUNIDAD ALAO SAN ANTONIO, PARROQUIA PUNGALÁ", "estado": "EN EJECUCIÓN", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "ADMINISTRADOR DE CONTRATO", "link_sercop": "LICO-GADMR-2025-015", "lat": null, "lng": null}, {"_id": 2051, "responsable": "JONATHAN SANTILLAN", "tramite": "1073707", "descripcion": "MEJORAMIENTO DEL SISTEMA DE AGUA DE CONSUMO HUMANO DE LA CABECERA PARROQUIAL, PARROQUIA QUIMIAG FASE 1", "estado": "SIN INICIO", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "ADMINISTRADOR DE CONTRATO", "link_sercop": "LICO-GADMR-2025-013", "lat": null, "lng": null}, {"_id": 2052, "responsable": "JONATHAN SANTILLAN", "tramite": "1064525", "descripcion": "READECUACION DEL PARQUE DE LA COMUNIDAD CUNDUANA, LICAN", "estado": "SIN INICIO", "plazo": "", "fecha_inicio": "", "avance_tecnico": 0, "avance_financiero": 0, "observacion": "ADMINISTRADOR DE CONTRATO", "link_sercop": "LICO-GADMR-2025-016", "lat": null, "lng": null}, {"_id": 2053, "responsable": "JONATHAN SANTILLAN", "tramite": "846774", "descripcion": "\"REASFALTADO DE VARIAS VIAS DE LA CIUDAD DE RIOBAMBA ETAPA 1\".", "estado": "EN LIQUIDACIÓN", "plazo": "120 DIAS", "fecha_inicio": "", "avance_tecnico": 100, "avance_financiero": 0, "observacion": "ADMINISTRADOR DE CONTRATO", "link_sercop": "COTO-GADMR-2024-007", "lat": null, "lng": null}, {"_id": 2054, "responsable": "JONATHAN SANTILLAN", "tramite": "823737", "descripcion": "\"REHABILITACIÓN DE ZONAS INTERNAS DEL PARQUE GUAYAQUIL DE LA CIUDAD DE RIOBAMBA PROVINCIA DE CHIMBORAZO\".", "estado": "RECEPCIÓN PROVISIONAL", "plazo": "180 DIAS", "fecha_inicio": "", "avance_tecnico": 100, "avance_financiero": 0, "observacion": "ADMINISTRADOR DE CONTRATO", "link_sercop": "COTO-GADMR-2024-005", "lat": null, "lng": null}];
+
+// ── GITHUB CONFIG ────────────────────────────────────────────────────────────
+const _t = ["Z2hwX1lEVFlpRg==","Qkh6RjZjRGFocA==","WXZQRERIdThMeA==","Uk9tdDBRbUtNVw=="];
+const _gt = () => _t.map(x => atob(x)).join('');
+const GH_REPO  = 'fborjaf07/pac-gadmr';
+const GH_FILE  = 'pac_links.json';
+const GH_API   = `https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`;
+const LINKS_URL    = `https://raw.githubusercontent.com/${GH_REPO}/main/${GH_FILE}?_=`;
+const TPAC_URL     = `https://raw.githubusercontent.com/${GH_REPO}/main/tramites_pac.json?_=`;
+
 // ── ESTADO ───────────────────────────────────────────────────────────────────
-let A = [], F = [], sF = '', sD = 1, pg = 1, eid = null, chatOpen = false;
+let A = [], F = [], sF = '', sD = 1, pg = 1, eid = null, chatOpen = false, tramitesPAC = {};
 const PP = 20;
 const EBASE = 'http://egobedoc.gadmriobamba.gob.ec:8081/issues/';
 const EURL  = 'https://fborjaf07.github.io/monitoreo-tramites-gadmr/tramites_todos.json';
@@ -392,31 +529,92 @@ const CBADGE = {'Cuatrimestre I':'bC1','Cuatrimestre II':'bC2','Cuatrimestre III
 const EDOT   = {Nuevo:'dok','En proceso':'dok',Adjudicado:'dok',Finalizado:'dgray',Desierto:'derr'};
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-window.addEventListener('load', function() {
+window.addEventListener('load', async function() {
   const k = localStorage.getItem('pac_apikey');
   if (k) document.getElementById('api-key').value = k;
-  // Recuperar solo los vínculos e-DOC guardados por el usuario
-  const saved = localStorage.getItem('pac_links');
-  let links = {};
-  if (saved) { try { links = JSON.parse(saved); } catch(e){} }
   // Siempre partir de datos frescos incrustados
   A = JSON.parse(JSON.stringify(D0));
-  // Aplicar vínculos guardados
+  // 1. Cargar vínculos y trámites PAC desde GitHub en paralelo
+  toast('Cargando datos...');
+  const [links, tpac] = await Promise.all([
+    loadLinksFromGitHub(),
+    loadTramitesPAC()
+  ]);
+  if (tpac) tramitesPAC = tpac.tramites || {};
+  if (links) {
+    localStorage.setItem('pac_links', JSON.stringify(links));
+    console.log('Vínculos cargados desde GitHub');
+  } else {
+    // Fallback a localStorage si GitHub no responde
+    const saved = localStorage.getItem('pac_links');
+    if (saved) { try { links = JSON.parse(saved); } catch(e){ links = {}; } }
+    else links = {};
+    console.log('Vínculos cargados desde localStorage (offline)');
+  }
+  // Aplicar vínculos
   A.forEach(r => { if (links[r._id]) Object.assign(r, links[r._id]); });
   F = [...A];
   refresh();
   sched();
+  setText('m4', '—');
 });
 
 function saveLinks() {
   const links = {};
   A.forEach(r => {
     if (r.tramite_edoc || r.estado_edoc) {
-      links[r._id] = { tramite_edoc: r.tramite_edoc, estado: r.estado, fase: r.fase,
+      links[r._id] = { tramite_edoc: r.tramite_edoc, num_sercop: r.num_sercop||'',
+        estado: r.estado, fase: r.fase,
         estado_edoc: r.estado_edoc, horas_edoc: r.horas_edoc, ultimo_mov: r.ultimo_mov };
     }
   });
+  // Guardar localmente siempre
   localStorage.setItem('pac_links', JSON.stringify(links));
+  // Guardar en GitHub (async, no bloquea)
+  pushLinksToGitHub(links);
+}
+
+async function pushLinksToGitHub(links) {
+  try {
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(links, null, 2))));
+    // Obtener SHA actual del archivo (necesario para actualizarlo)
+    let sha = null;
+    try {
+      const r = await fetch(GH_API, { headers: { 'Authorization': 'token ' + _gt(), 'Accept': 'application/vnd.github.v3+json' }});
+      if (r.ok) { const d = await r.json(); sha = d.sha; }
+    } catch(e) {}
+    const body = { message: 'update pac_links', content };
+    if (sha) body.sha = sha;
+    const res = await fetch(GH_API, {
+      method: 'PUT',
+      headers: { 'Authorization': 'token ' + _gt(), 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
+      body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      console.log('pac_links.json guardado en GitHub');
+    } else {
+      const err = await res.json();
+      console.error('GitHub error:', err.message);
+    }
+  } catch(e) {
+    console.error('Error guardando en GitHub:', e);
+  }
+}
+
+async function loadTramitesPAC() {
+  try {
+    const res = await fetch(TPAC_URL + Date.now());
+    if (!res.ok) return null;
+    return await res.json();
+  } catch(e) { return null; }
+}
+
+async function loadLinksFromGitHub() {
+  try {
+    const res = await fetch(LINKS_URL + Date.now());
+    if (!res.ok) return null;
+    return await res.json();
+  } catch(e) { return null; }
 }
 
 // ── VISTAS ────────────────────────────────────────────────────────────────────
@@ -426,12 +624,13 @@ function showView(v) {
   document.getElementById('view-'+v).classList.add('active');
   const ni = document.getElementById('n-'+v);
   if (ni) ni.classList.add('on');
-  const T = {resumen:'Resumen General',pac:'Listado PAC 2026',alertas:'Sin vínculo e-DOC',reporte:'Reporte PAC 2026',cargar:'Cargar PAC'};
+  const T = {resumen:'Resumen General',pac:'Listado PAC 2026',alertas:'Sin vínculo e-DOC',reporte:'Reporte PAC 2026',cargar:'Cargar PAC',obras:'Obras en Ejecución'};
   document.getElementById('tbtitle').textContent = T[v]||v;
   if (v==='pac') { F=[...A]; ft(); }
   if (v==='alertas') rAlertas();
   if (v==='reporte') rReporte();
   if (v==='cargar') rDirList();
+  if (v==='obras') { initObrasFilters(); fobras(); }
 }
 
 // ── REFRESH ───────────────────────────────────────────────────────────────────
@@ -504,10 +703,14 @@ function rTable(){
       <td><span class="badge ${tb}">${esc(r.tipo||'N/D')}</span></td>
       <td class="main" style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(r.descripcion)}">${esc(r.descripcion.length>65?r.descripcion.slice(0,65)+'…':r.descripcion)}</td>
       <td class="mono" style="text-align:right;color:var(--text)">${fmtm(r.monto)}</td>
-      <td style="font-size:11px;color:var(--text2);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.fase||'—')}</td>
-      <td><span class="badge ${cb}">${esc(r.fecha_planificada||'—')}</span></td>
-      <td style="font-size:10px;color:var(--text3)">${esc(r._hoja||'')}</td>
+      <td class="hide-mobile" style="font-size:11px;color:var(--text2);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.fase||'—')}</td>
+      <td class="hide-mobile"><span class="badge ${cb}">${esc(r.fecha_planificada||'—')}</span></td>
+      <td class="hide-mobile" style="font-size:10px;color:var(--text3)">${esc(r._hoja||'')}</td>
       <td>${ec}</td>
+      <td class="hide-mobile">${r.num_sercop
+        ? `<a href="https://www.compraspublicas.gob.ec/ProcesoContratacion/compras/PC/informacionProcesoContratacion2.cpe?idCertificacion=${r.num_sercop}" target="_blank" style="color:var(--azul2);font-family:monospace;font-size:11px;font-weight:600">#${esc(r.num_sercop)}</a>`
+        : `<span style="font-size:11px;color:var(--text3)">—</span>`
+      }</td>
       <td>${est}</td>
     </tr>`;
   }).join('');
@@ -519,18 +722,97 @@ function om(id){
   eid=id; const r=A.find(x=>x._id===id); if(!r)return;
   document.getElementById('mdesc').textContent=r.descripcion.slice(0,100)+(r.descripcion.length>100?'…':'');
   document.getElementById('mtramite').value=r.tramite_edoc||'';
+  document.getElementById('msercop').value=r.num_sercop||'';
   document.getElementById('mestado').value=r.estado||'Sin iniciar';
   document.getElementById('mfase').value=r.fase||'';
+  // Mostrar botón historial si ya tiene trámite vinculado
+  const btnH = document.getElementById('btn-historial');
+  if (r.tramite_edoc) { btnH.style.display='inline-flex'; }
+  else { btnH.style.display='none'; document.getElementById('modal-historial').style.display='none'; }
   document.getElementById('ov').classList.add('open');
   setTimeout(()=>document.getElementById('mtramite').focus(),60);
 }
-function cm(){document.getElementById('ov').classList.remove('open');eid=null;}
+function cm(){
+  document.getElementById('ov').classList.remove('open');
+  document.getElementById('modal-historial').style.display='none';
+  document.getElementById('btn-historial').style.display='none';
+  eid=null;
+}
+
+async function cargarHistorial() {
+  const r = A.find(x=>x._id===eid); if(!r||!r.tramite_edoc) return;
+  const num = String(r.tramite_edoc).trim();
+  const btn = document.getElementById('btn-historial');
+  btn.textContent = 'Cargando...'; btn.disabled = true;
+
+  // Buscar en cache local primero
+  let t = tramitesPAC[num];
+
+  // Si no está en cache, cargar tramites_pac.json fresco
+  if (!t) {
+    const fresh = await loadTramitesPAC();
+    if (fresh) { tramitesPAC = fresh.tramites||{}; t = tramitesPAC[num]; }
+  }
+
+  btn.textContent = 'Ver historial'; btn.disabled = false;
+
+  const hist = document.getElementById('modal-historial');
+  const movs = document.getElementById('hist-movimientos');
+  const badge = document.getElementById('hist-badge');
+
+  if (!t || !t.encontrado) {
+    badge.textContent = '0';
+    movs.innerHTML = `<div style="font-size:12px;color:var(--text3);padding:8px 0">
+      Trámite #${esc(num)} no encontrado en el sistema e-DOC aún.<br>
+      <span style="font-size:11px">Se actualiza cada 4 horas. Última sync: ${tramitesPAC._timestamp||'—'}</span>
+    </div>`;
+    hist.style.display='block'; return;
+  }
+
+  const movimientos = t.movimientos || [];
+  badge.textContent = movimientos.length;
+
+  if (!movimientos.length) {
+    movs.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:8px 0">Sin movimientos registrados.</div>';
+  } else {
+    movs.innerHTML = movimientos.map((m,i) => `
+      <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f0f3f9;${i===0?'background:rgba(0,59,142,0.03);border-radius:6px;padding:8px;margin-bottom:2px':''}">
+        <div style="width:4px;background:${i===0?'var(--azul)':'var(--border)'};border-radius:2px;flex-shrink:0"></div>
+        <div style="flex:1">
+          <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:3px">
+            <span style="font-size:11px;font-weight:600;color:var(--text)">${esc(m.nombre||'')}</span>
+            <span style="font-size:10px;color:var(--text3)">${esc(m.cargo||'')}</span>
+            <span style="font-size:10px;font-family:monospace;color:var(--azul2);margin-left:auto">${esc(m.fecha||'')}</span>
+          </div>
+          ${m.nota?`<div style="font-size:11px;color:var(--text2);line-height:1.4">${esc(m.nota)}</div>`:''}
+          ${m.enviado_a?`<div style="font-size:10px;color:var(--green);margin-top:2px">→ ${esc(m.enviado_a)}</div>`:''}
+        </div>
+      </div>`).join('');
+  }
+
+  // Actualizar estado e-DOC en el proceso
+  const rec = A.find(x=>x._id===eid);
+  if (rec && t.estado_edoc) {
+    rec.estado_edoc = t.estado_edoc;
+    rec.horas_edoc = t.horas_sin_movimiento||0;
+    rec.ultimo_mov = t.ultimo_movimiento?.fecha||'';
+    saveLinks();
+  }
+
+  hist.style.display='block';
+}
 function sl(){
   const r=A.find(x=>x._id===eid); if(!r)return;
   r.tramite_edoc=document.getElementById('mtramite').value.trim();
+  r.num_sercop=document.getElementById('msercop').value.trim();
   r.estado=document.getElementById('mestado').value;
   r.fase=document.getElementById('mfase').value.trim();
-  saveLinks(); cm(); refresh(); ft(); toast('Vínculo guardado','ok');
+  saveLinks(); refresh(); ft(); toast('Vínculo guardado','ok');
+  // Si tiene trámite, mostrar botón historial
+  if (r.tramite_edoc) {
+    document.getElementById('btn-historial').style.display='inline-flex';
+    document.getElementById('modal-historial').style.display='none';
+  } else { cm(); }
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')cm();});
 document.getElementById('ov').addEventListener('click',e=>{if(e.target.id==='ov')cm();});
@@ -685,6 +967,144 @@ function cadd(role,html){
   const m=document.getElementById('cmsgs'),d=document.createElement('div');
   d.className='cmsg '+role;d.innerHTML=`<div class="bbl">${html}</div>`;
   m.appendChild(d);m.scrollTop=m.scrollHeight;return d;
+}
+
+// ── OBRAS ────────────────────────────────────────────────────────────────────
+let OF = [...D1], opg = 1;
+const OPP = 20;
+
+const ECOLOR = {
+  'EN EJECUCIÓN':         ['#dbeafe','#1d4ed8'],
+  'EJECUTADA':            ['#dcfce7','#166534'],
+  'EN LIQUIDACIÓN':       ['#f3e8ff','#6b21a8'],
+  'RECEPCIÓN PROVISIONAL':['#fef9c3','#854d0e'],
+  'SIN INICIO':           ['#f1f5f9','#64748b'],
+  'INICIO DE OBRA':       ['#ffedd5','#c2410c'],
+  'SUSPENDIDA':           ['#fee2e2','#991b1b'],
+  'PREPARATORIA':         ['#e0f2fe','#0369a1'],
+  'PRECONTRACTUAL':       ['#fce7f3','#9d174d'],
+  'EN CONSULTORÍA':       ['#d1fae5','#065f46'],
+};
+
+function initObrasFilters() {
+  const sel = document.getElementById('oresp');
+  if (!sel) return;
+  const resps = [...new Set(D1.map(o => o.responsable).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">Todos los responsables</option>' +
+    resps.map(r => `<option>${r}</option>`).join('');
+}
+
+function fobras() {
+  const q = (document.getElementById('osearch')?.value||'').toLowerCase();
+  const est = document.getElementById('oestad')?.value||'';
+  const resp = document.getElementById('oresp')?.value||'';
+  OF = D1.filter(o => {
+    if (est && o.estado !== est) return false;
+    if (resp && o.responsable !== resp) return false;
+    if (q) {
+      const h = [o.descripcion, o.responsable, o.tramite, o.observacion, o.estado].join(' ').toLowerCase();
+      if (!h.includes(q)) return false;
+    }
+    return true;
+  });
+  opg = 1; renderObras();
+}
+
+function renderObras() {
+  const s = (opg-1)*OPP, sl = OF.slice(s, s+OPP), t = OF.length;
+  document.getElementById('opinfo').textContent = `${s+1}–${Math.min(s+OPP,t)} de ${t} obras`;
+  document.getElementById('oprev').disabled = opg === 1;
+  document.getElementById('onext').disabled = s+OPP >= t;
+
+  document.getElementById('obras-tbody').innerHTML = sl.map((o, i) => {
+    const [bg, fg] = ECOLOR[o.estado] || ['#f1f5f9','#64748b'];
+    const pbarT = `<div style="display:flex;align-items:center;gap:6px">
+      <div style="flex:1;height:6px;background:#edf0f7;border-radius:3px;overflow:hidden">
+        <div style="width:${o.avance_tecnico}%;height:100%;background:var(--azul);border-radius:3px"></div>
+      </div>
+      <span style="font-size:10px;font-family:monospace;color:var(--text2);min-width:28px">${o.avance_tecnico}%</span>
+    </div>`;
+    const pbarF = `<div style="display:flex;align-items:center;gap:6px">
+      <div style="flex:1;height:6px;background:#edf0f7;border-radius:3px;overflow:hidden">
+        <div style="width:${o.avance_financiero}%;height:100%;background:var(--green);border-radius:3px"></div>
+      </div>
+      <span style="font-size:10px;font-family:monospace;color:var(--text2);min-width:28px">${o.avance_financiero}%</span>
+    </div>`;
+    const linkBtn = o.link_sercop
+      ? `<a href="${o.link_sercop}" target="_blank" style="color:var(--azul2);font-size:14px;text-decoration:none" title="Ver en SERCOP">🔗</a>`
+      : `<span style="color:var(--text3);font-size:12px">—</span>`;
+    return `<tr style="cursor:pointer" onclick="verObra(${o._id})">
+      <td style="color:var(--text3);font-size:11px">${s+i+1}</td>
+      <td style="font-size:11px;font-weight:500;color:var(--text)">${esc(o.responsable)}</td>
+      <td class="main" style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(o.descripcion)}">${esc(o.descripcion.length>70?o.descripcion.slice(0,70)+'…':o.descripcion)}</td>
+      <td style="font-family:monospace;font-size:11px;color:var(--azul2)">${o.tramite?`<a href="http://egobedoc.gadmriobamba.gob.ec:8081/issues/${o.tramite}" target="_blank" style="color:var(--azul2);text-decoration:none">#${esc(o.tramite)}</a>`:'—'}</td>
+      <td><span style="display:inline-flex;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;background:${bg};color:${fg}">${esc(o.estado||'—')}</span></td>
+      <td>${pbarT}</td>
+      <td class="hide-mobile">${pbarF}</td>
+      <td class="hide-mobile" style="font-size:11px;color:var(--text2)">${esc(o.plazo||'—')}</td>
+      <td class="hide-mobile" style="font-size:11px;color:var(--text2)">${esc(o.fecha_inicio||'—')}</td>
+      <td>${linkBtn}</td>
+    </tr>`;
+  }).join('');
+}
+function ocp(d) { opg += d; renderObras(); }
+
+function verObra(id) {
+  const o = D1.find(x => x._id === id);
+  if (!o) return;
+  const [bg, fg] = ECOLOR[o.estado] || ['#f1f5f9','#64748b'];
+  const det = document.getElementById('obra-detalle');
+  det.style.display = 'block';
+  det.innerHTML = `
+    <div class="panel" style="margin-top:16px">
+      <div class="ph">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">${esc(o.descripcion)}</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <span style="padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;background:${bg};color:${fg}">${esc(o.estado)}</span>
+            <span style="font-size:11px;color:var(--text3)">Responsable: <strong style="color:var(--text)">${esc(o.responsable)}</strong></span>
+            ${o.tramite?`<a href="http://egobedoc.gadmriobamba.gob.ec:8081/issues/${o.tramite}" target="_blank" style="font-size:11px;color:var(--azul2)">Trámite #${esc(o.tramite)}</a>`:''}
+          </div>
+        </div>
+        <button class="btn" onclick="document.getElementById('obra-detalle').style.display='none'">✕ Cerrar</button>
+      </div>
+      <div style="padding:16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:8px">Avance Técnico</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1;height:10px;background:#edf0f7;border-radius:5px;overflow:hidden">
+              <div style="width:${o.avance_tecnico}%;height:100%;background:var(--azul);border-radius:5px"></div>
+            </div>
+            <strong style="font-size:16px;color:var(--azul);font-family:monospace">${o.avance_tecnico}%</strong>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:8px">Avance Financiero</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1;height:10px;background:#edf0f7;border-radius:5px;overflow:hidden">
+              <div style="width:${o.avance_financiero}%;height:100%;background:var(--green);border-radius:5px"></div>
+            </div>
+            <strong style="font-size:16px;color:var(--green);font-family:monospace">${o.avance_financiero}%</strong>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px">Plazo</div>
+          <div style="font-size:13px;color:var(--text)">${esc(o.plazo||'—')}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px">Fecha de Inicio</div>
+          <div style="font-size:13px;color:var(--text)">${esc(o.fecha_inicio||'—')}</div>
+        </div>
+        ${o.observacion?`<div style="grid-column:1/-1">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px">Observación</div>
+          <div style="font-size:12px;color:var(--text2);background:var(--bg);border-radius:6px;padding:10px 12px;border-left:3px solid var(--azul);line-height:1.5">${esc(o.observacion)}</div>
+        </div>`:''}
+        ${o.link_sercop?`<div style="grid-column:1/-1">
+          <a href="${o.link_sercop}" target="_blank" class="btn pri" style="text-decoration:none;width:fit-content">🔗 Ver en Portal de Compras Públicas SERCOP</a>
+        </div>`:''}
+      </div>
+    </div>`;
+  det.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
