@@ -1,0 +1,488 @@
+{
+  "2001": {
+    "tramite_edoc": "1063236",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2002": {
+    "tramite_edoc": "1062092",
+    "num_sercop": "",
+    "estado": "SIN INICIO",
+    "fase": "SIN INICIO",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2003": {
+    "tramite_edoc": "523425",
+    "num_sercop": "",
+    "estado": "EJECUTADA",
+    "fase": "EJECUTADA",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2004": {
+    "tramite_edoc": "948729",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2005": {
+    "tramite_edoc": "536381",
+    "num_sercop": "",
+    "estado": "SUSPENDIDA",
+    "fase": "SUSPENDIDA",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2006": {
+    "tramite_edoc": "861056",
+    "num_sercop": "",
+    "estado": "RECEPCIÓN PROVISIONAL",
+    "fase": "RECEPCIÓN PROVISIONAL",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2007": {
+    "tramite_edoc": "687140",
+    "num_sercop": "",
+    "estado": "RECEPCIÓN PROVISIONAL",
+    "fase": "RECEPCIÓN PROVISIONAL",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2008": {
+    "tramite_edoc": "912860",
+    "num_sercop": "",
+    "estado": "EN LIQUIDACIÓN",
+    "fase": "EN LIQUIDACIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2009": {
+    "tramite_edoc": "1056181",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2010": {
+    "tramite_edoc": "944866",
+    "num_sercop": "",
+    "estado": "EJECUTADA",
+    "fase": "EJECUTADA",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2011": {
+    "tramite_edoc": "554267",
+    "num_sercop": "",
+    "estado": "EJECUTADA",
+    "fase": "EJECUTADA",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2012": {
+    "tramite_edoc": "1160875",
+    "num_sercop": "",
+    "estado": "PREPARATORIA",
+    "fase": "PREPARATORIA",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2013": {
+    "tramite_edoc": "1140677",
+    "num_sercop": "",
+    "estado": "PREPARATORIA",
+    "fase": "PREPARATORIA",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2014": {
+    "tramite_edoc": "1169501",
+    "num_sercop": "",
+    "estado": "PREPARATORIA",
+    "fase": "PREPARATORIA",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2015": {
+    "tramite_edoc": "1158314",
+    "num_sercop": "",
+    "estado": "PREPARATORIA",
+    "fase": "PREPARATORIA",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2016": {
+    "tramite_edoc": "1127108",
+    "num_sercop": "",
+    "estado": "PRECONTRACTUAL",
+    "fase": "PRECONTRACTUAL",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2017": {
+    "tramite_edoc": "1070230",
+    "num_sercop": "",
+    "estado": "EN EJECUCUIN",
+    "fase": "EN EJECUCUIN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2018": {
+    "tramite_edoc": "1070852",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2019": {
+    "tramite_edoc": "829080",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2020": {
+    "tramite_edoc": "1167949",
+    "num_sercop": "",
+    "estado": "",
+    "fase": "",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2021": {
+    "tramite_edoc": "776697",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2022": {
+    "tramite_edoc": "1155418",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2023": {
+    "tramite_edoc": "979053",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2024": {
+    "tramite_edoc": "1073895",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2025": {
+    "tramite_edoc": "1062815",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2026": {
+    "tramite_edoc": "877574",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2027": {
+    "tramite_edoc": "693745",
+    "num_sercop": "",
+    "estado": "RECEOCIÓN PROVISIONAL",
+    "fase": "RECEOCIÓN PROVISIONAL",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2028": {
+    "tramite_edoc": "960305",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2029": {
+    "tramite_edoc": "689324",
+    "num_sercop": "",
+    "estado": "",
+    "fase": "",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2030": {
+    "tramite_edoc": "828756",
+    "num_sercop": "",
+    "estado": "",
+    "fase": "",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2031": {
+    "tramite_edoc": "857028",
+    "num_sercop": "",
+    "estado": "",
+    "fase": "",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2032": {
+    "tramite_edoc": "774884",
+    "num_sercop": "",
+    "estado": "",
+    "fase": "",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2033": {
+    "tramite_edoc": "960215",
+    "num_sercop": "",
+    "estado": "",
+    "fase": "",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2034": {
+    "tramite_edoc": "1065662",
+    "num_sercop": "",
+    "estado": "",
+    "fase": "",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2035": {
+    "tramite_edoc": "1073354",
+    "num_sercop": "",
+    "estado": "",
+    "fase": "",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2036": {
+    "tramite_edoc": "968207",
+    "num_sercop": "",
+    "estado": "",
+    "fase": "",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2037": {
+    "tramite_edoc": "1126537",
+    "num_sercop": "",
+    "estado": "SUSPENDIDA",
+    "fase": "SUSPENDIDA",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2038": {
+    "tramite_edoc": "1061845",
+    "num_sercop": "",
+    "estado": "INICIO DE OBRA",
+    "fase": "INICIO DE OBRA",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2039": {
+    "tramite_edoc": "1073890",
+    "num_sercop": "",
+    "estado": "INICIO DE OBRA",
+    "fase": "INICIO DE OBRA",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2040": {
+    "tramite_edoc": "1058316",
+    "num_sercop": "",
+    "estado": "SUSPENDIDA",
+    "fase": "SUSPENDIDA",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2041": {
+    "tramite_edoc": "1063648",
+    "num_sercop": "",
+    "estado": "INICIO DE OBRA",
+    "fase": "INICIO DE OBRA",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2042": {
+    "tramite_edoc": "1064670",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2043": {
+    "tramite_edoc": "1080186",
+    "num_sercop": "",
+    "estado": "SIN INICIO",
+    "fase": "SIN INICIO",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2044": {
+    "tramite_edoc": "1063592",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2045": {
+    "tramite_edoc": "1069853",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2046": {
+    "tramite_edoc": "1060871",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2047": {
+    "tramite_edoc": "1067601",
+    "num_sercop": "",
+    "estado": "EN CONSULTORÍA",
+    "fase": "EN CONSULTORÍA",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2048": {
+    "tramite_edoc": "854294",
+    "num_sercop": "",
+    "estado": "SUSPENDIDA",
+    "fase": "SUSPENDIDA",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2049": {
+    "tramite_edoc": "1078469",
+    "num_sercop": "",
+    "estado": "SIN INICIO",
+    "fase": "SIN INICIO",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2050": {
+    "tramite_edoc": "1073348",
+    "num_sercop": "",
+    "estado": "EN EJECUCIÓN",
+    "fase": "EN EJECUCIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2051": {
+    "tramite_edoc": "1073707",
+    "num_sercop": "",
+    "estado": "SIN INICIO",
+    "fase": "SIN INICIO",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2052": {
+    "tramite_edoc": "1064525",
+    "num_sercop": "",
+    "estado": "SIN INICIO",
+    "fase": "SIN INICIO",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2053": {
+    "tramite_edoc": "846774",
+    "num_sercop": "",
+    "estado": "EN LIQUIDACIÓN",
+    "fase": "EN LIQUIDACIÓN",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  },
+  "2054": {
+    "tramite_edoc": "823737",
+    "num_sercop": "",
+    "estado": "RECEPCIÓN PROVISIONAL",
+    "fase": "RECEPCIÓN PROVISIONAL",
+    "estado_edoc": "",
+    "horas_edoc": null,
+    "ultimo_mov": ""
+  }
+}
