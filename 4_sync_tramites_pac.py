@@ -1,10 +1,4 @@
 #!/usr/bin/env python3
-"""
-4_sync_tramites_pac.py
-Lee pac_links.json de pac-gadmr, hace login CAS via Playwright,
-extrae historial de cada tramite y sube tramites_pac.json a pac-gadmr.
-"""
-
 import json, os, re, time, base64, urllib.request
 from datetime import datetime, timezone
 from playwright.sync_api import sync_playwright
@@ -74,15 +68,18 @@ def extraer_tramite(page, numero):
 
 def subir_github(data):
     token = os.environ.get("PAC_GADMR_TOKEN", "")
-    if not token: print("[WARN] Sin PAC_GADMR_TOKEN"); return
+    if not token:
+        print("[WARN] Sin PAC_GADMR_TOKEN")
+        return
     repo  = "fborjaf07/pac-gadmr"
     fname = "tramites_pac.json"
     url   = f"https://api.github.com/repos/{repo}/contents/{fname}"
     content = base64.b64encode(json.dumps(data, ensure_ascii=False, indent=2).encode()).decode()
     sha = None
     try:
-        req = urllib.request.Request(url, headers={"Authorization": f"token {token}",
-              "Accept": "application/vnd.github.v3+json"})
+        req = urllib.request.Request(url, headers={
+            "Authorization": f"token {token}",
+            "Accept": "application/vnd.github.v3+json"})
         sha = json.loads(urllib.request.urlopen(req).read())["sha"]
     except: pass
     body = {"message": "sync: tramites_pac", "content": content}
@@ -91,31 +88,31 @@ def subir_github(data):
         headers={"Authorization": f"token {token}", "Content-Type": "application/json",
                  "Accept": "application/vnd.github.v3+json"})
     urllib.request.urlopen(req2)
-    print(f"[OK] tramites_pac.json → {repo}")
+    print(f"[OK] tramites_pac.json subido a {repo}")
 
 if __name__ == "__main__":
     print("=" * 60)
-    print(f"Sync Trámites PAC — {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+    print(f"Sync Tramites PAC — {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     print("=" * 60)
 
-    # Leer pac_links.json desde pac-gadmr
     numeros = []
     try:
-        url = "https://raw.githubusercontent.com/fborjaf07/pac-gadmr/main/pac_links.json?_=" + str(int(time.time()))
+        url = f"https://raw.githubusercontent.com/fborjaf07/pac-gadmr/main/pac_links.json?_={int(time.time())}"
         links = json.loads(urllib.request.urlopen(url).read())
         numeros = sorted(set(
             str(v.get("tramite_edoc","")).strip()
             for v in links.values() if v.get("tramite_edoc","").strip()
         ))
-        print(f"[OK] {len(numeros)} trámites vinculados: {numeros}")
+        print(f"[OK] {len(numeros)} tramites a extraer: {numeros}")
     except Exception as e:
         print(f"[ERROR] pac_links.json: {e}")
 
     if not numeros:
         output = {"timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S"),
                   "total_vinculados": 0, "total_encontrados": 0, "tramites": {}}
-        with open(OUTPUT, "w") as f: json.dump(output, f)
-        print("[OK] Sin vínculos — tramites_pac.json vacío")
+        with open(OUTPUT, "w") as f:
+            json.dump(output, f)
+        print("[OK] Sin vinculos — tramites_pac.json vacio")
     else:
         resultado = {}
         with sync_playwright() as p:
